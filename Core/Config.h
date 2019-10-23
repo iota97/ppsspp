@@ -195,6 +195,7 @@ public:
 	int iFarCullHack;
 	int iRoundWorldHack;
 	bool bVertexColor;
+	bool bHideHudHack;
 	int iPhongHack; // 0 = off, other value as %
 	bool bNoFogHack;
 	bool bBlockTransferGPU;
