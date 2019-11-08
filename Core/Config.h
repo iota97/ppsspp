@@ -193,7 +193,7 @@ public:
 	int iCamZHack;
 	int iCamRotHack;
 	int iFarCullHack;
-	bool bTextureBorderHack;
+	int iTextureBorderHack;
 	int iRoundWorldHack;
 	bool bVertexColorHack;
 	bool bNormalHack;
