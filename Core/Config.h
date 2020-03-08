@@ -187,18 +187,18 @@ public:
 	bool bReloadCheats;
 	int iCwCheatRefreshRate;
 	int iBloomHack; //0 = off, 1 = safe, 2 = balanced, 3 = aggressive
-	int iFovHack;
-	int iCamXHack;
-	int iCamYHack;
-	int iCamZHack;
-	int iCamRotHack;
-	int iFarCullHack;
-	int iTextureBorderHack;
-	int iRoundWorldHack;
+	float fFovHack;
+	float fCamXHack;
+	float fCamYHack;
+	float fCamZHack;
+	float fCamRotHack;
+	float fFarCullHack;
+	float fTextureBorderHack;
+	float fRoundWorldHack;
+	float fToonHack;
 	bool bVertexColorHack;
 	bool bNormalHack;
 	bool bHideHudHack;
-	int iToonHack; // 0 = off, other value as %
 	bool bLimboHack;
 	bool bNoFogHack;
 	bool bBlockTransferGPU;

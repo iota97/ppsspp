@@ -252,7 +252,7 @@ bool GenerateFragmentShader(const FShaderID &id, char *buffer, uint64_t *uniform
 	}
 
 	// Round World far hack
-	if (g_Config.iFarCullHack != 1000 || g_Config.bHideHudHack) {
+	if (g_Config.fFarCullHack != 1.0f || g_Config.bHideHudHack) {
 		WRITE(p, "%s float h_depth;\n", varying);
 	}
 
@@ -368,7 +368,7 @@ bool GenerateFragmentShader(const FShaderID &id, char *buffer, uint64_t *uniform
 					WRITE(p, "  vec4 t = %s(tex, %s.xy);\n", texture, texcoord);
 					
 					// Texture border
-					if (g_Config.iTextureBorderHack != 0) {
+					if (g_Config.fTextureBorderHack != 0.0f) {
 
 						// Sobel edge detect
 						WRITE(p, "  float dlt = 0.004;\n");
@@ -389,7 +389,7 @@ bool GenerateFragmentShader(const FShaderID &id, char *buffer, uint64_t *uniform
 						WRITE(p, "  float dv = c0+c3+c3+c6-(c2+c5+c5+c8);\n");
 
 						// Set edge to black
-						WRITE(p, "  if (sqrt(dh*dh+dv*dv) > %f)\n", 1.0-g_Config.iTextureBorderHack/100.0);
+						WRITE(p, "  if (sqrt(dh*dh+dv*dv) > %f)\n", 1.0f-g_Config.fTextureBorderHack);
 						WRITE(p, "    t.rgb = vec3(0.0);\n");
 					}
 				
@@ -489,14 +489,14 @@ bool GenerateFragmentShader(const FShaderID &id, char *buffer, uint64_t *uniform
 			if (texFunc != GE_TEXFUNC_REPLACE || !doTextureAlpha) {
 				WRITE(p, "  vec4 p = v_color0;\n");
 
-				if (g_Config.iToonHack != 0) { // Toon hack
+				if (g_Config.fToonHack != 0.0f) { // Toon hack
 					WRITE(p, "  vec4 K0 = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n");
 					WRITE(p, "  vec4 p0 = mix(vec4(p.bg, K0.wz), vec4(p.gb, K0.xy), step(p.b, p.g));\n");
 					WRITE(p, "  vec4 q0 = mix(vec4(p0.xyw, p.r), vec4(p.r, p0.yzx), step(p0.x, p.r));\n");
 					WRITE(p, "  float d0 = q0.x - min(q0.w, q0.y);\n"); 
 					WRITE(p, "  float e0 = 1.0e-10;\n");
 					WRITE(p, "  vec3 hsv = vec3(abs(q0.z + (q0.w - q0.y) / (6.0 * d0 + e0)), d0 / (q0.x + e0), q0.x);\n");
-					WRITE(p, "  if (hsv.z < %f)\n", g_Config.iToonHack/100.0);
+					WRITE(p, "  if (hsv.z < %f)\n", g_Config.fToonHack);
 					WRITE(p, "    hsv.z = 0.4;\n");
 					WRITE(p, "  else\n");
 					WRITE(p, "    hsv.z = 1.0;\n");
@@ -808,8 +808,8 @@ bool GenerateFragmentShader(const FShaderID &id, char *buffer, uint64_t *uniform
 	}
 	
 	// Round World far hack
-	if (g_Config.iFarCullHack != 1000) {
-		WRITE(p, "  if (h_depth > %f) v.rgb = vec3(0.0);\n", g_Config.iFarCullHack/1000.0 );
+	if (g_Config.fFarCullHack != 1.0f) {
+		WRITE(p, "  if (h_depth > %f) v.rgb = vec3(0.0);\n", g_Config.fFarCullHack);
 	}
 
 	switch (stencilToAlpha) {

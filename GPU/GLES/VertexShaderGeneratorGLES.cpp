@@ -365,7 +365,7 @@ void GenerateVertexShader(const VShaderID &id, char *buffer, uint32_t *attrMask,
 	}
 
 	// Round World far hack
-	if (g_Config.iFarCullHack != 1000 || g_Config.bHideHudHack) {
+	if (g_Config.fFarCullHack != 1.0f || g_Config.bHideHudHack) {
 		WRITE(p, "%s float h_depth;\n",  varying);
 	}
 
@@ -609,23 +609,23 @@ void GenerateVertexShader(const VShaderID &id, char *buffer, uint32_t *attrMask,
 		WRITE(p, "  vec4 viewPos = u_view * vec4(worldpos, 1.0);\n");
 
 		// Round World hack
-		if (g_Config.iRoundWorldHack != 0) {
-			WRITE(p, "  float rotAngle1 = length(viewPos)*%f;\n", g_Config.iRoundWorldHack/100000.0);
+		if (g_Config.fRoundWorldHack != 0.0f) {
+			WRITE(p, "  float rotAngle1 = length(viewPos)*%f;\n", g_Config.fRoundWorldHack/100000.0f);
 			WRITE(p, "  viewPos.yz = vec2(viewPos.y*cos(rotAngle1)+viewPos.z*sin(rotAngle1), viewPos.z*cos(rotAngle1)-viewPos.y*sin(rotAngle1));\n");
 		}
 
 		// Camera hacks
-		if (g_Config.iCamXHack != 0 || g_Config.iCamYHack != 0 || g_Config.iCamZHack != 0) {
-			WRITE(p, "  viewPos.xyz += vec3(%d.0, %d.0, %d.0)*viewPos.w;\n", g_Config.iCamXHack, g_Config.iCamYHack, g_Config.iCamZHack);
+		if (g_Config.fCamXHack != 0.0f || g_Config.fCamYHack != 0.0f || g_Config.fCamZHack != 0.0f) {
+			WRITE(p, "  viewPos.xyz += vec3(%d.0, %d.0, %d.0)*viewPos.w;\n", g_Config.fCamXHack, g_Config.fCamYHack, g_Config.fCamZHack);
 		}
 
-		if (g_Config.iCamRotHack != 0) {
-			WRITE(p, "  float rotAngle = %f;\n", 3.14159265358979323846*g_Config.iCamRotHack/180.0);
+		if (g_Config.fCamRotHack != 0.0f) {
+			WRITE(p, "  float rotAngle = %f;\n", 3.14159265358979323846*g_Config.fCamRotHack/180.0f);
 			WRITE(p, "  viewPos.yz = vec2(viewPos.y*cos(rotAngle)+viewPos.z*sin(rotAngle), viewPos.z*cos(rotAngle)-viewPos.y*sin(rotAngle));\n");
 		}
 
-		if (g_Config.iFovHack != 100) {
-			WRITE(p, "  viewPos.xy *= %f;\n", 100.0/g_Config.iFovHack);
+		if (g_Config.fFovHack != 1.0f) {
+			WRITE(p, "  viewPos.xy *= %f;\n", 1.0/g_Config.fFovHack);
 		}
 
 		// Final view and projection transforms.
@@ -884,7 +884,7 @@ void GenerateVertexShader(const VShaderID &id, char *buffer, uint32_t *attrMask,
 	WRITE(p, "  gl_Position = outPos;\n");
 
 	// Round World far hack
-	if (g_Config.iFarCullHack != 1000 || g_Config.bHideHudHack) {
+	if (g_Config.fFarCullHack != 1.0f || g_Config.bHideHudHack) {
 		WRITE(p, "  h_depth = outPos.z/outPos.w;\n");
 	}
 

@@ -1461,16 +1461,15 @@ void HackScreen::CreateViews() {
 
 	list->Add(new ItemHeader(gr->T("Graphic Hack", "Graphic Hack Settings (these WILL cause glitches and WILL NOT work with many games)")));
 
-	PopupSliderChoice *fovHack = list->Add(new PopupSliderChoice(&g_Config.iFovHack, 1, 300, gr->T("Fov override"), 1, screenManager()));
-	fovHack->SetFormat("%i%%");
-	PopupSliderChoice *camXHack = list->Add(new PopupSliderChoice(&g_Config.iCamXHack, -2000, 2000, gr->T("Camera offset X"), 1, screenManager()));
-	PopupSliderChoice *camYHack = list->Add(new PopupSliderChoice(&g_Config.iCamYHack, -2000, 2000, gr->T("Camera offset Y"), 1, screenManager()));
-	PopupSliderChoice *camZHack = list->Add(new PopupSliderChoice(&g_Config.iCamZHack, -2000, 2000, gr->T("Camera offset Z"), 1, screenManager()));
-	PopupSliderChoice *camRotHack = list->Add(new PopupSliderChoice(&g_Config.iCamRotHack, -180, 180, gr->T("Camera rotation"), 1, screenManager()));
-	PopupSliderChoice *roundWorldHack = list->Add(new PopupSliderChoice(&g_Config.iRoundWorldHack, -30, 30, gr->T("Round world"), 1, screenManager()));
-	PopupSliderChoice *farCullHack = list->Add(new PopupSliderChoice(&g_Config.iFarCullHack, 0, 1000, gr->T("Round world far cull"), 1, screenManager()));
-	PopupSliderChoice *toonHack = list->Add(new PopupSliderChoice(&g_Config.iToonHack, 0, 100, gr->T("Toon threshold (0: disabled)"), 1, screenManager()));
-	PopupSliderChoice *textureBorderHack = list->Add(new PopupSliderChoice(&g_Config.iTextureBorderHack, 0, 100, gr->T("Texture border (0: disabled)"), 1, screenManager()));
+	PopupSliderChoiceFloat *fovHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fFovHack, 0.01f, 3.0f, gr->T("Fov override"), 0.01f, screenManager()));
+	PopupSliderChoiceFloat *camXHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamXHack, -3000.0f, 3000.0f, gr->T("Camera offset X"), 0.1f, screenManager()));
+	PopupSliderChoiceFloat *camYHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamYHack, -3000.0f, 3000.0f, gr->T("Camera offset Y"), 0.1f, screenManager()));
+	PopupSliderChoiceFloat *camZHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamZHack, -3000.0f, 3000.0f, gr->T("Camera offset Z"), 0.1f, screenManager()));
+	PopupSliderChoiceFloat *camRotHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamRotHack, -180.0f, 180.0f, gr->T("Camera rotation"), 0.1f, screenManager()));
+	PopupSliderChoiceFloat *roundWorldHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fRoundWorldHack, -50.0f, 50.0f, gr->T("Round world"), 0.1f, screenManager()));
+	PopupSliderChoiceFloat *farCullHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fFarCullHack, 0.0f, 1.0f, gr->T("Round world far cull"), 0.001f, screenManager()));
+	PopupSliderChoiceFloat *toonHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fToonHack, 0.0f, 1.0f, gr->T("Toon threshold (0: disabled)"), 0.01f, screenManager()));
+	PopupSliderChoiceFloat *textureBorderHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fTextureBorderHack, 0.0f, 1.0f, gr->T("Texture border (0: disabled)"), 0.01f, screenManager()));
 	CheckBox *hideHudHack = list->Add(new CheckBox(&g_Config.bHideHudHack, gr->T("Hide game HUD")));
 	CheckBox *noFogHack = list->Add(new CheckBox(&g_Config.bNoFogHack, gr->T("Disable fog")));
 	CheckBox *limboHack = list->Add(new CheckBox(&g_Config.bLimboHack, gr->T("Limbo hack")));
