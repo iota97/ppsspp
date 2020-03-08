@@ -616,7 +616,7 @@ void GenerateVertexShader(const VShaderID &id, char *buffer, uint32_t *attrMask,
 
 		// Camera hacks
 		if (g_Config.fCamXHack != 0.0f || g_Config.fCamYHack != 0.0f || g_Config.fCamZHack != 0.0f) {
-			WRITE(p, "  viewPos.xyz += vec3(%d.0, %d.0, %d.0)*viewPos.w;\n", g_Config.fCamXHack, g_Config.fCamYHack, g_Config.fCamZHack);
+			WRITE(p, "  viewPos.xyz += vec3(%f, %f, %f)*viewPos.w;\n", g_Config.fCamXHack, g_Config.fCamYHack, g_Config.fCamZHack);
 		}
 
 		if (g_Config.fCamRotHack != 0.0f) {
