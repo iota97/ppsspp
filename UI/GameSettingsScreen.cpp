@@ -1461,12 +1461,12 @@ void HackScreen::CreateViews() {
 
 	list->Add(new ItemHeader(gr->T("Graphic Hack", "Graphic Hack Settings (these WILL cause glitches and WILL NOT work with many games)")));
 
-	PopupSliderChoiceFloat *fovHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fFovHack, 0.01f, 3.0f, gr->T("Fov override"), 0.01f, screenManager()));
-	PopupSliderChoiceFloat *camXHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamXHack, -3000.0f, 3000.0f, gr->T("Camera offset X"), 0.1f, screenManager()));
-	PopupSliderChoiceFloat *camYHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamYHack, -3000.0f, 3000.0f, gr->T("Camera offset Y"), 0.1f, screenManager()));
-	PopupSliderChoiceFloat *camZHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamZHack, -3000.0f, 3000.0f, gr->T("Camera offset Z"), 0.1f, screenManager()));
-	PopupSliderChoiceFloat *camRotHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamRotHack, -180.0f, 180.0f, gr->T("Camera rotation"), 0.1f, screenManager()));
-	PopupSliderChoiceFloat *roundWorldHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fRoundWorldHack, -50.0f, 50.0f, gr->T("Round world"), 0.1f, screenManager()));
+	PopupSliderChoiceFloat *fovHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fFovHack, 0.01f, 3.0f, gr->T("Fov override"), 1.0f, screenManager()));
+	PopupSliderChoiceFloat *camXHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamXHack, -10000.0f, 10000.0f, gr->T("Camera offset X"), 10.0f, screenManager()));
+	PopupSliderChoiceFloat *camYHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamYHack, -10000.0f, 10000.0f, gr->T("Camera offset Y"), 10.0f, screenManager()));
+	PopupSliderChoiceFloat *camZHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamZHack, -10000.0f, 10000.0f, gr->T("Camera offset Z"), 10.0f, screenManager()));
+	PopupSliderChoiceFloat *camRotHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fCamRotHack, -180.0f, 180.0f, gr->T("Camera rotation"), 1.0f, screenManager()));
+	PopupSliderChoiceFloat *roundWorldHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fRoundWorldHack, -50.0f, 50.0f, gr->T("Round world"), 1.0f, screenManager()));
 	PopupSliderChoiceFloat *farCullHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fFarCullHack, 0.0f, 1.0f, gr->T("Round world far cull"), 0.001f, screenManager()));
 	PopupSliderChoiceFloat *toonHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fToonHack, 0.0f, 1.0f, gr->T("Toon threshold (0: disabled)"), 0.01f, screenManager()));
 	PopupSliderChoiceFloat *textureBorderHack = list->Add(new PopupSliderChoiceFloat(&g_Config.fTextureBorderHack, 0.0f, 1.0f, gr->T("Texture border (0: disabled)"), 0.01f, screenManager()));
