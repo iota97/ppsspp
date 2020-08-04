@@ -309,6 +309,16 @@ public:
 	int iRightAnalogPress;
 	bool bRightAnalogCustom;
 
+	// Motion gesture controller
+	bool bGestureControlEnabled;
+	int iSwipeUp;
+	int iSwipeDown;
+	int iSwipeLeft;
+	int iSwipeRight;
+	float fSwipeSensitivity;
+	float fSwipeSmoothing;
+	int iDoubleTapGesture;
+
 	// Disable diagonals
 	bool bDisableDpadDiagonals;
 	bool bGamepadOnlyFocused;
