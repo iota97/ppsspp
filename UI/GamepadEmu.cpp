@@ -30,6 +30,8 @@
 #include "math/math_util.h"
 #include "ui/ui_context.h"
 
+static uint32_t usedPointerMask = 0;
+
 static u32 GetButtonColor() {
 	return g_Config.iTouchButtonStyle != 0 ? 0xFFFFFF : 0xc0b080;
 }
@@ -84,6 +86,7 @@ void MultiTouchButton::Touch(const TouchInput &input) {
 	GamepadView::Touch(input);
 	if ((input.flags & TOUCH_DOWN) && bounds_.Contains(input.x, input.y)) {
 		pointerDownMask_ |= 1 << input.id;
+		usedPointerMask |= 1 << input.id;
 	}
 	if (input.flags & TOUCH_MOVE) {
 		if (bounds_.Contains(input.x, input.y))
@@ -93,9 +96,11 @@ void MultiTouchButton::Touch(const TouchInput &input) {
 	}
 	if (input.flags & TOUCH_UP) {
 		pointerDownMask_ &= ~(1 << input.id);
+		usedPointerMask &= ~(1 << input.id);
 	}
 	if (input.flags & TOUCH_RELEASE_ALL) {
 		pointerDownMask_ = 0;
+		usedPointerMask = 0;
 	}
 }
 
@@ -273,6 +278,7 @@ void PSPDpad::Touch(const TouchInput &input) {
 	if (input.flags & TOUCH_DOWN) {
 		if (dragPointerId_ == -1 && bounds_.Contains(input.x, input.y)) {
 			dragPointerId_ = input.id;
+			usedPointerMask |= 1 << input.id;
 			ProcessTouch(input.x, input.y, true);
 		}
 	}
@@ -284,6 +290,7 @@ void PSPDpad::Touch(const TouchInput &input) {
 	if (input.flags & TOUCH_UP) {
 		if (input.id == dragPointerId_) {
 			dragPointerId_ = -1;
+			usedPointerMask &= ~(1 << input.id);
 			ProcessTouch(input.x, input.y, false);
 		}
 	}
@@ -433,6 +440,7 @@ void PSPStick::Touch(const TouchInput &input) {
 		centerY_ = bounds_.centerY();
 		__CtrlSetAnalogX(0.0f, stick_);
 		__CtrlSetAnalogY(0.0f, stick_);
+		usedPointerMask = 0;
 		return;
 	}
 	if (input.flags & TOUCH_DOWN) {
@@ -445,6 +453,7 @@ void PSPStick::Touch(const TouchInput &input) {
 				centerY_ = bounds_.centerY();
 			}
 			dragPointerId_ = input.id;
+			usedPointerMask |= 1 << input.id;
 			ProcessTouch(input.x, input.y, true);
 		}
 	}
@@ -458,6 +467,7 @@ void PSPStick::Touch(const TouchInput &input) {
 			dragPointerId_ = -1;
 			centerX_ = bounds_.centerX();
 			centerY_ = bounds_.centerY();
+			usedPointerMask &= ~(1 << input.id);
 			ProcessTouch(input.x, input.y, false);
 		}
 	}
@@ -533,6 +543,7 @@ void PSPCustomStick::Touch(const TouchInput &input) {
 		centerY_ = bounds_.centerY();
 		posX_ = 0.0f;
 		posY_ = 0.0f;
+		usedPointerMask = 0;
 		return;
 	}
 	if (input.flags & TOUCH_DOWN) {
@@ -545,6 +556,7 @@ void PSPCustomStick::Touch(const TouchInput &input) {
 				centerY_ = bounds_.centerY();
 			}
 			dragPointerId_ = input.id;
+			usedPointerMask |= 1 << input.id;
 			ProcessTouch(input.x, input.y, true);
 		}
 	}
@@ -558,6 +570,7 @@ void PSPCustomStick::Touch(const TouchInput &input) {
 			dragPointerId_ = -1;
 			centerX_ = bounds_.centerX();
 			centerY_ = bounds_.centerY();
+			usedPointerMask &= ~(1 << input.id);
 			ProcessTouch(input.x, input.y, false);
 		}
 	}
@@ -865,5 +878,108 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause) {
 	addComboKey(g_Config.iCombokey3, g_Config.bComboToggle3, roundImage, ImageID("I_ROUND"), comboKeyImages[3], g_Config.touchCombo3);
 	addComboKey(g_Config.iCombokey4, g_Config.bComboToggle4, roundImage, ImageID("I_ROUND"), comboKeyImages[4], g_Config.touchCombo4);
 
+	if (g_Config.bGestureControlEnabled)
+		root->Add(new GestureGamepad());
+
 	return root;
+}
+
+
+void GestureGamepad::Touch(const TouchInput &input) {
+	static const int button[16] = {CTRL_LTRIGGER, CTRL_RTRIGGER, CTRL_SQUARE, CTRL_TRIANGLE, CTRL_CIRCLE, CTRL_CROSS, CTRL_UP, CTRL_DOWN, CTRL_LEFT, CTRL_RIGHT, CTRL_START, CTRL_SELECT};
+
+	if (usedPointerMask & (1 << input.id)) {
+		if (input.id == dragPointerId_)
+			dragPointerId_ = -1;
+		return;
+	}
+
+	if (input.flags & TOUCH_RELEASE_ALL) {
+		dragPointerId_ = -1;
+		return;
+	}
+
+	if (input.flags & TOUCH_DOWN) {
+		if (dragPointerId_ == -1) {
+			dragPointerId_ = input.id;
+			lastX_ = input.x;
+			lastY_ = input.y;
+
+			const float now = time_now();
+			if (now - lastTapRelease_ < 0.3f && !haveDoubleTapped_) {
+				if (g_Config.iDoubleTapGesture != 0 )
+					__CtrlButtonDown(button[g_Config.iDoubleTapGesture-1]);
+				haveDoubleTapped_ = true;
+			}
+
+			lastTouchDown_ = now;
+		}
+	}
+	if (input.flags & TOUCH_MOVE) {
+		if (input.id == dragPointerId_) {
+			deltaX_ += input.x - lastX_;
+			deltaY_ += input.y - lastY_;
+			lastX_ = input.x;
+			lastY_ = input.y;
+		}
+	}
+	if (input.flags & TOUCH_UP) {
+		if (input.id == dragPointerId_) {
+			dragPointerId_ = -1;
+			if (time_now() - lastTouchDown_ < 0.3f)
+				lastTapRelease_ = time_now();
+
+			if (haveDoubleTapped_) {
+				if (g_Config.iDoubleTapGesture != 0)
+					__CtrlButtonUp(button[g_Config.iDoubleTapGesture-1]);
+				haveDoubleTapped_ = false;
+			}
+		}
+	}
+}
+
+void GestureGamepad::Update() {
+	static const int button[16] = {CTRL_LTRIGGER, CTRL_RTRIGGER, CTRL_SQUARE, CTRL_TRIANGLE, CTRL_CIRCLE, CTRL_CROSS, CTRL_UP, CTRL_DOWN, CTRL_LEFT, CTRL_RIGHT, CTRL_START, CTRL_SELECT};
+
+	const float th = 1.0f;
+	float dx = deltaX_ * g_dpi_scale_x * g_Config.fSwipeSensitivity;
+	float dy = deltaY_ * g_dpi_scale_y * g_Config.fSwipeSensitivity;
+	if (g_Config.iSwipeRight != 0) {
+		if (dx > th) {
+			__CtrlButtonDown(button[g_Config.iSwipeRight-1]);
+			swipeRightReleased_ = false;
+		} else if (!swipeRightReleased_) {
+			__CtrlButtonUp(button[g_Config.iSwipeRight-1]);
+			swipeRightReleased_ = true;
+		}
+	}
+	if (g_Config.iSwipeLeft != 0) {
+		if (dx < -th) {
+			__CtrlButtonDown(button[g_Config.iSwipeLeft-1]);
+			swipeLeftReleased_ = false;
+		} else if (!swipeLeftReleased_) {
+			__CtrlButtonUp(button[g_Config.iSwipeLeft-1]);
+			swipeLeftReleased_ = true;
+		}
+	}
+	if (g_Config.iSwipeUp != 0) {
+		if (dy < -th) {
+			__CtrlButtonDown(button[g_Config.iSwipeUp-1]);
+			swipeUpReleased_ = false;
+		} else if (!swipeUpReleased_) {
+			__CtrlButtonUp(button[g_Config.iSwipeUp-1]);
+			swipeUpReleased_ = true;
+		}
+	}
+	if (g_Config.iSwipeDown != 0) {
+		if (dy > th) {
+			__CtrlButtonDown(button[g_Config.iSwipeDown-1]);
+			swipeDownReleased_ = false;
+		} else if (!swipeDownReleased_) {
+			__CtrlButtonUp(button[g_Config.iSwipeDown-1]);
+			swipeDownReleased_ = true;
+		}
+	}
+	deltaX_ *= g_Config.fSwipeSmoothing;
+	deltaY_ *= g_Config.fSwipeSmoothing;
 }
