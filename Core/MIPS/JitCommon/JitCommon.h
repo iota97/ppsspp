@@ -154,5 +154,5 @@ namespace MIPSComp {
 
 	void DoDummyJitState(PointerWrap &p);
 
-	JitInterface *CreateNativeJit(MIPSState *mips);
+	JitInterface *CreateNativeJit(MIPSState *mipsState);
 }

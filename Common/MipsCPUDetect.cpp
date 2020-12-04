@@ -17,10 +17,14 @@
 
 #ifdef __mips__
 
-#include "Common.h"
-#include "CPUDetect.h"
-#include "StringUtils.h"
-#include "FileUtil.h"
+#include <cstring>
+#include <sstream>
+
+#include "Common/Common.h"
+#include "Common/CPUDetect.h"
+#include "Common/StringUtils.h"
+#include "Common/File/FileUtil.h"
+#include "Common/Data/Encoding/Utf8.h"
 
 // Only Linux platforms have /proc/cpuinfo
 #if defined(__linux__)
