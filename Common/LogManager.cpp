@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <cstring>
-#include <cstdarg>
 
 #include "Common/Data/Encoding/Utf8.h"
 
