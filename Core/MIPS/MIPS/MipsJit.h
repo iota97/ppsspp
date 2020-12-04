@@ -183,8 +183,8 @@ public:
 	const u8 *dispatcherNoCheck;
 };
 
-typedef void (MipsJit::*MIPSCompileFunc)(MIPSOpcode opcode);
-typedef int (MipsJit::*MIPSReplaceFunc)();
+//typedef void (MipsJit::*MIPSCompileFunc)(MIPSOpcode opcode);
+//typedef int (MipsJit::*MIPSReplaceFunc)();
 
 }	// namespace MIPSComp
 

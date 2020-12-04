@@ -16,10 +16,12 @@
 // https://github.com/hrydgard/ppsspp and http://www.ppsspp.org/.
 
 #include "ppsspp_config.h"
+
 #if PPSSPP_ARCH(MIPS)
 
 #include "Common/Profiler/Profiler.h"
 #include "Common/Serialize/Serializer.h"
+#include "Common/Serialize/SerializeFuncs.h"
 #include "Core/Reporting.h"
 #include "Core/Config.h"
 #include "Core/Core.h"

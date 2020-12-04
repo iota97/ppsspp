@@ -21,7 +21,11 @@
 #include <vector>
 #include <stdint.h>
 
-#include "Common.h"
+#include "Common/ArmCommon.h"
+#include "Common/BitSet.h"
+#include "Common/CodeBlock.h"
+#include "Common/Common.h"
+#include "Common/Log.h"
 
 namespace MIPSGen {
 
@@ -72,16 +76,16 @@ public:
 	MIPSEmitter() : code_(0), lastCacheFlushEnd_(0) {
 	}
 	MIPSEmitter(u8 *code_ptr) : code_(code_ptr), lastCacheFlushEnd_(code_ptr) {
-		SetCodePtr(code_ptr);
+		SetCodePointer(code_ptr);
 	}
 	virtual ~MIPSEmitter() {
 	}
 
-	void SetCodePtr(u8 *ptr);
+	void SetCodePointer(u8 *ptr, u8 *writablePtr = 0);
 	void ReserveCodeSpace(u32 bytes);
 	const u8 *AlignCode16();
 	const u8 *AlignCodePage();
-	const u8 *GetCodePtr() const;
+	const u8 *GetCodePointer() const;
 	u8 *GetWritableCodePtr();
 	void FlushIcache();
 	void FlushIcacheSection(u8 *start, u8 *end);
@@ -270,7 +274,7 @@ private:
 // Everything that needs to generate machine code should inherit from this.
 // You get memory management for free, plus, you can use all the LUI etc functions without
 // having to prefix them with gen-> or something similar.
-class MIPSCodeBlock : public MIPSEmitter {
+class MIPSCodeBlock : public CodeBlock<MIPSEmitter> {
 public:
 	MIPSCodeBlock() : region(nullptr), region_size(0) {
 	}

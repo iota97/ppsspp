@@ -27,7 +27,7 @@
 #include "Common/CPUDetect.h"
 
 namespace MIPSGen {
-void MIPSEmitter::SetCodePtr(u8 *ptr) {
+void MIPSEmitter::SetCodePointer(u8 *ptr, u8 *writablePtr) {
 	code_ = ptr;
 	lastCacheFlushEnd_ = ptr;
 }
@@ -49,7 +49,7 @@ const u8 *MIPSEmitter::AlignCodePage() {
 	return code_;
 }
 
-const u8 *MIPSEmitter::GetCodePtr() const {
+const u8 *MIPSEmitter::GetCodePointer() const {
 	return code_;
 }
 
