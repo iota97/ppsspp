@@ -35,8 +35,6 @@
 #include "Common/Arm64Emitter.h"
 #elif PPSSPP_ARCH(X86) || PPSSPP_ARCH(AMD64)
 #include "Common/x64Emitter.h"
-#elif PPSSPP_ARCH(MIPS)
-#include "Common/MipsEmitter.h"
 #else
 #include "Common/FakeEmitter.h"
 #endif
@@ -608,8 +606,6 @@ class VertexDecoderJitCache : public ArmGen::ARMXCodeBlock {
 class VertexDecoderJitCache : public Arm64Gen::ARM64CodeBlock {
 #elif PPSSPP_ARCH(X86) || PPSSPP_ARCH(AMD64)
 class VertexDecoderJitCache : public Gen::XCodeBlock {
-#elif PPSSPP_ARCH(MIPS)
-class VertexDecoderJitCache : public MIPSGen::MIPSCodeBlock {
 #else
 class VertexDecoderJitCache : public FakeGen::FakeXCodeBlock {
 #endif

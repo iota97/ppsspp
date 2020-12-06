@@ -26,8 +26,6 @@
 #include "Common/Arm64Emitter.h"
 #elif PPSSPP_ARCH(X86) || PPSSPP_ARCH(AMD64)
 #include "Common/x64Emitter.h"
-#elif PPSSPP_ARCH(MIPS)
-#include "Common/MipsEmitter.h"
 #else
 #include "Common/FakeEmitter.h"
 #endif
@@ -99,8 +97,6 @@ class SamplerJitCache : public ArmGen::ARMXCodeBlock {
 class SamplerJitCache : public Arm64Gen::ARM64CodeBlock {
 #elif PPSSPP_ARCH(X86) || PPSSPP_ARCH(AMD64)
 class SamplerJitCache : public Gen::XCodeBlock {
-#elif PPSSPP_ARCH(MIPS)
-class SamplerJitCache : public MIPSGen::MIPSCodeBlock {
 #else
 class SamplerJitCache : public FakeGen::FakeXCodeBlock {
 #endif
