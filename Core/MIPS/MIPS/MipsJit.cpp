@@ -16,8 +16,8 @@
 // https://github.com/hrydgard/ppsspp and http://www.ppsspp.org/.
 
 #include "ppsspp_config.h"
-
-#if PPSSPP_ARCH(MIPS)
+//#if PPSSPP_ARCH(MIPS)
+#if false
 
 #include "Common/Profiler/Profiler.h"
 #include "Common/Serialize/Serializer.h"

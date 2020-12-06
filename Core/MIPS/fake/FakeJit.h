@@ -30,7 +30,7 @@ namespace MIPSComp {
 
 typedef int FakeReg;
 
-class FakeJit : public FakeGen::FakeXCodeBlock {
+class FakeJit : public FakeGen::FakeXCodeBlock, public JitInterface, public MIPSFrontendInterface {
 public:
 	FakeJit(MIPSState *mipsState);
 
@@ -131,6 +131,18 @@ public:
 	void InvalidateCacheAt(u32 em_address, int length = 4);
 
 	void EatPrefix() { js.EatPrefix(); }
+	
+	// Added just to make it not abstract, no logic whatsoever
+	bool CodeInRange(const u8 *ptr) const override { return true; }
+	const u8 *GetDispatcher() const override { return nullptr; }
+	const u8 *GetCrashHandler() const override { return nullptr; }
+	JitBlockCacheDebugInterface *GetBlockCacheDebugInterface() override { return nullptr; }
+	void UpdateFCR31() override { return; }
+	MIPSOpcode GetOriginalOp(MIPSOpcode op) override { return op; }
+	std::vector<u32> SaveAndClearEmuHackOps() override { return std::vector<u32>(); }
+	void RestoreSavedEmuHackOps(std::vector<u32> saved) override { return; }
+	void LinkBlock(u8 *exitPoint, const u8 *entryPoint) override { return; }
+	void UnlinkBlock(u8 *checkedEntry, u32 originalAddress) override { return; }
 
 private:
 	void GenerateFixedCode();
