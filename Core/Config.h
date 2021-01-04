@@ -54,7 +54,7 @@ struct ConfigTouchPos {
 };
 
 struct ConfigCustomButton {
-	int key;
+	uint64_t key;
 	int image;
 	int shape;
 	float rotation;

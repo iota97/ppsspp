@@ -650,11 +650,9 @@ public:
 	Choice(const std::string &text, LayoutParams *layoutParams = nullptr)
 		: Choice(text, std::string(), false, layoutParams) {}
 	Choice(const std::string &text, const std::string &smallText, bool selected = false, LayoutParams *layoutParams = nullptr)
-		: ClickableItem(layoutParams), text_(text), smallText_(smallText), atlasImage_(ImageID::invalid()), atlasImageBg_(ImageID::invalid()), iconImage_(ImageID::invalid()), centered_(false), highlighted_(false), selected_(selected) {}
+		: ClickableItem(layoutParams), text_(text), smallText_(smallText), atlasImage_(ImageID::invalid()), iconImage_(ImageID::invalid()), centered_(false), highlighted_(false), selected_(selected) {}
 	Choice(ImageID image, LayoutParams *layoutParams = nullptr)
-		: ClickableItem(layoutParams), atlasImage_(image), atlasImageBg_(ImageID::invalid()), iconImage_(ImageID::invalid()), centered_(false), highlighted_(false), selected_(false) {}
-	Choice(ImageID image, ImageID bgImage, LayoutParams *layoutParams = nullptr)
-		: ClickableItem(layoutParams), atlasImage_(image), atlasImageBg_(bgImage), iconImage_(ImageID::invalid()), centered_(false), highlighted_(false), selected_(false) {}
+		: ClickableItem(layoutParams), atlasImage_(image), iconImage_(ImageID::invalid()), centered_(false), highlighted_(false), selected_(false) {}
 
 	void Click() override;
 	virtual void HighlightChanged(bool highlighted);
@@ -675,7 +673,6 @@ protected:
 	std::string text_;
 	std::string smallText_;
 	ImageID atlasImage_;
-	ImageID atlasImageBg_;
 	ImageID iconImage_;  // Only applies for text, non-centered
 	Padding textPadding_;
 	bool centered_;

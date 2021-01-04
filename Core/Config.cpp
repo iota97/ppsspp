@@ -68,15 +68,17 @@ struct ConfigSetting {
 		TYPE_BOOL,
 		TYPE_INT,
 		TYPE_UINT32,
+		TYPE_UINT64,
 		TYPE_FLOAT,
 		TYPE_STRING,
 		TYPE_TOUCH_POS,
-		TYPE_CUSTOM_BUTTON,
+		TYPE_CUSTOM_BUTTON
 	};
 	union Value {
 		bool b;
 		int i;
 		uint32_t u;
+		uint64_t lu;
 		float f;
 		const char *s;
 		ConfigTouchPos touchPos;
@@ -86,6 +88,7 @@ struct ConfigSetting {
 		bool *b;
 		int *i;
 		uint32_t *u;
+		uint64_t *lu;
 		float *f;
 		std::string *s;
 		ConfigTouchPos *touchPos;
@@ -95,6 +98,7 @@ struct ConfigSetting {
 	typedef bool (*BoolDefaultCallback)();
 	typedef int (*IntDefaultCallback)();
 	typedef uint32_t (*Uint32DefaultCallback)();
+	typedef uint64_t (*Uint64DefaultCallback)();
 	typedef float (*FloatDefaultCallback)();
 	typedef const char *(*StringDefaultCallback)();
 	typedef ConfigTouchPos (*TouchPosDefaultCallback)();
@@ -104,6 +108,7 @@ struct ConfigSetting {
 		BoolDefaultCallback b;
 		IntDefaultCallback i;
 		Uint32DefaultCallback u;
+		Uint32DefaultCallback lu;
 		FloatDefaultCallback f;
 		StringDefaultCallback s;
 		TouchPosDefaultCallback touchPos;
@@ -142,6 +147,13 @@ struct ConfigSetting {
 		ptr_.u = v;
 		cb_.u = nullptr;
 		default_.u = def;
+	}
+
+	ConfigSetting(const char *ini, uint64_t *v, uint64_t def, bool save = true, bool perGame = false)
+		: ini_(ini), type_(TYPE_UINT64), report_(false), save_(save), perGame_(perGame) {
+		ptr_.lu = v;
+		cb_.lu = nullptr;
+		default_.lu = def;
 	}
 
 	ConfigSetting(const char *ini, float *v, float def, bool save = true, bool perGame = false)
@@ -242,6 +254,11 @@ struct ConfigSetting {
 				default_.u = cb_.u();
 			}
 			return section->Get(ini_, ptr_.u, default_.u);
+		case TYPE_UINT64:
+			if (cb_.lu) {
+				default_.lu = cb_.lu();
+			}
+			return section->Get(ini_, ptr_.lu, default_.lu);
 		case TYPE_FLOAT:
 			if (cb_.f) {
 				default_.f = cb_.f();
@@ -296,6 +313,8 @@ struct ConfigSetting {
 			return section->Set(ini_, *ptr_.i);
 		case TYPE_UINT32:
 			return section->Set(ini_, *ptr_.u);
+		case TYPE_UINT64:
+			return section->Set(ini_, *ptr_.lu);
 		case TYPE_FLOAT:
 			return section->Set(ini_, *ptr_.f);
 		case TYPE_STRING:
@@ -332,6 +351,8 @@ struct ConfigSetting {
 			return data.Add(prefix + ini_, *ptr_.i);
 		case TYPE_UINT32:
 			return data.Add(prefix + ini_, *ptr_.u);
+		case TYPE_UINT64:
+			return data.Add(prefix + ini_, *ptr_.lu);
 		case TYPE_FLOAT:
 			return data.Add(prefix + ini_, *ptr_.f);
 		case TYPE_STRING:
