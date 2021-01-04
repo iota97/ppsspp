@@ -29,9 +29,37 @@
 #include "Common/TimeUtil.h"
 #include "Common/StringUtils.h"
 #include "Core/Config.h"
+#include "UI/GamepadEmu.h"
 
 #include "TouchControlVisibilityScreen.h"
 #include "UI/ComboKeyMappingScreen.h"
+
+class ButtonPreview : public MultiTouchButton {
+public:
+	ButtonPreview(ImageID bgImg, ImageID img, float rotation, int x, int y)
+	: MultiTouchButton(bgImg, bgImg, img, 1.0f, new UI::AnchorLayoutParams(x, y, UI::NONE, UI::NONE, true)),
+		x_(x), y_(y), rot_(rotation), bgImg_(bgImg), img_(img) {
+	}
+	bool IsDown() override {
+		return false;
+	}
+
+	void Draw(UIContext &dc) override {
+		float opacity = g_Config.iTouchButtonOpacity / 100.0f;
+
+		uint32_t colorBg = colorAlpha(g_Config.iTouchButtonStyle != 0 ? 0xFFFFFF : 0xc0b080, opacity);
+		uint32_t color = colorAlpha(0xFFFFFF, opacity);
+
+		dc.Draw()->DrawImageRotated(bgImg_, x_, y_, 1.0f, 0, colorBg, false);
+		dc.Draw()->DrawImageRotated(img_, x_, y_, 1.0f, rot_*PI/180, color, false);
+	}
+private:
+	int x_;
+	int y_;
+	float rot_;
+	ImageID bgImg_;
+	ImageID img_;
+};
 
 void ComboKeyScreen::CreateViews() {
 	using namespace UI;
@@ -123,7 +151,9 @@ void ComboKeyScreen::CreateViews() {
 
 	ImageID rectImage = g_Config.iTouchButtonStyle ? ImageID("I_RECT_LINE") : ImageID("I_RECT");
 	ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
-	leftColumn->Add(new Choice(comboKeyImages[cfg->image], cfg->shape ? rectImage : roundImage));
+
+	leftColumn->Add(new ButtonPreview(cfg->shape ? rectImage : roundImage, comboKeyImages[cfg->image], cfg->rotation, 62, 82));
+
 	root__->Add(leftColumn);
 	rightScroll_ = new ScrollView(ORIENT_VERTICAL, new LinearLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 1.0f));
 	leftColumn->Add(new Spacer(new LinearLayoutParams(1.0f)));
@@ -142,7 +172,7 @@ void ComboKeyScreen::CreateViews() {
 	PopupMultiChoice *icon = vertLayout->Add(new PopupMultiChoice(&(cfg->image), co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
 	icon->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
 
-	vertLayout->Add(new PopupSliderChoiceFloat(&(cfg->rotation), -180.0f, 180.0f, co->T("Icon rotation"), 5.0f, screenManager()))->OnClick.Handle(this, &ComboKeyScreen::onCombo);
+	vertLayout->Add(new PopupSliderChoiceFloat(&(cfg->rotation), -180.0f, 180.0f, co->T("Icon rotation"), 5.0f, screenManager()))->OnChange.Handle(this, &ComboKeyScreen::onCombo);
 	
 	static const char *shapeNames[] = { "Circle", "Rectangle" };
 	vertLayout->Add(new PopupMultiChoice(&(cfg->shape), co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()))->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
