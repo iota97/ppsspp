@@ -346,7 +346,6 @@ public:
 	float fDpadSpacing;
 	ConfigTouchPos touchStartKey;
 	ConfigTouchPos touchSelectKey;
-	ConfigTouchPos touchUnthrottleKey;
 	ConfigTouchPos touchLKey;
 	ConfigTouchPos touchRKey;
 	ConfigTouchPos touchAnalogStick;
@@ -362,12 +361,6 @@ public:
 	ConfigTouchPos touchCombo7;
 	ConfigTouchPos touchCombo8;
 	ConfigTouchPos touchCombo9;
-
-	ConfigTouchPos touchSpeed1Key;
-	ConfigTouchPos touchSpeed2Key;
-	ConfigTouchPos touchRapidFireKey;
-	ConfigTouchPos touchAnalogRotationCWKey;
-	ConfigTouchPos touchAnalogRotationCCWKey;
 
 	// Controls Visibility
 	bool bShowTouchControls;

@@ -980,7 +980,6 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("DPadSpacing", &g_Config.fDpadSpacing, 1.0f, true, true),
 	ConfigSetting("StartKeyX", "StartKeyY", "StartKeyScale", "ShowTouchStart", &g_Config.touchStartKey, defaultTouchPosShow, true, true),
 	ConfigSetting("SelectKeyX", "SelectKeyY", "SelectKeyScale", "ShowTouchSelect", &g_Config.touchSelectKey, defaultTouchPosShow, true, true),
-	ConfigSetting("UnthrottleKeyX", "UnthrottleKeyY", "UnthrottleKeyScale", "ShowTouchUnthrottle", &g_Config.touchUnthrottleKey, defaultTouchPosShow, true, true),
 	ConfigSetting("LKeyX", "LKeyY", "LKeyScale", "ShowTouchLTrigger", &g_Config.touchLKey, defaultTouchPosShow, true, true),
 	ConfigSetting("RKeyX", "RKeyY", "RKeyScale", "ShowTouchRTrigger", &g_Config.touchRKey, defaultTouchPosShow, true, true),
 	ConfigSetting("AnalogStickX", "AnalogStickY", "AnalogStickScale", "ShowAnalogStick", &g_Config.touchAnalogStick, defaultTouchPosShow, true, true),
@@ -996,12 +995,6 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("fcombo7X", "fcombo7Y", "comboKeyScale7", "ShowComboKey7", &g_Config.touchCombo7, defaultTouchPosHide, true, true),
 	ConfigSetting("fcombo8X", "fcombo8Y", "comboKeyScale8", "ShowComboKey8", &g_Config.touchCombo8, defaultTouchPosHide, true, true),
 	ConfigSetting("fcombo9X", "fcombo9Y", "comboKeyScale9", "ShowComboKey9", &g_Config.touchCombo9, defaultTouchPosHide, true, true),
-
-	ConfigSetting("Speed1KeyX", "Speed1KeyY", "Speed1KeyScale", "ShowSpeed1Key", &g_Config.touchSpeed1Key, defaultTouchPosHide, true, true),
-	ConfigSetting("Speed2KeyX", "Speed2KeyY", "Speed2KeyScale", "ShowSpeed2Key", &g_Config.touchSpeed2Key, defaultTouchPosHide, true, true),
-	ConfigSetting("RapidFireKeyX", "RapidFireKeyY", "RapidFireKeyScale", "ShowRapidFireKey", &g_Config.touchRapidFireKey, defaultTouchPosHide, true, true),
-	ConfigSetting("AnalogRotationCWKeyX", "AnalogRotationKeyCWY", "AnalogRotationKeyCWScale", "ShowAnalogRotationCWKey", &g_Config.touchAnalogRotationCWKey, defaultTouchPosHide, true, true),
-	ConfigSetting("AnalogRotationCCWKeyX", "AnalogRotationKeyCCWY", "AnalogRotationKeyCCWScale", "ShowAnalogRotationCCWKey", &g_Config.touchAnalogRotationCCWKey, defaultTouchPosHide, true, true),
 
 #ifdef _WIN32
 	ConfigSetting("DInputAnalogDeadzone", &g_Config.fDInputAnalogDeadzone, 0.1f, true, true),
@@ -1828,7 +1821,6 @@ void Config::ResetControlLayout() {
 	g_Config.fDpadSpacing = 1.0f;
 	reset(g_Config.touchStartKey);
 	reset(g_Config.touchSelectKey);
-	reset(g_Config.touchUnthrottleKey);
 	reset(g_Config.touchLKey);
 	reset(g_Config.touchRKey);
 	reset(g_Config.touchAnalogStick);
@@ -1843,11 +1835,6 @@ void Config::ResetControlLayout() {
 	reset(g_Config.touchCombo7);
 	reset(g_Config.touchCombo8);
 	reset(g_Config.touchCombo9);
-	reset(g_Config.touchSpeed1Key);
-	reset(g_Config.touchSpeed2Key);
-	reset(g_Config.touchRapidFireKey);
-	reset(g_Config.touchAnalogRotationCWKey);
-	reset(g_Config.touchAnalogRotationCCWKey);
 }
 
 void Config::GetReportingInfo(UrlEncoder &data) {

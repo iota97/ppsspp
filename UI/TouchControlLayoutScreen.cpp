@@ -380,26 +380,6 @@ void ControlLayoutView::CreateViews() {
 
 	addDragDropButton(g_Config.touchSelectKey, rectImage, ImageID("I_SELECT"));
 	addDragDropButton(g_Config.touchStartKey, rectImage, ImageID("I_START"));
-
-	if (auto *unthrottle = addDragDropButton(g_Config.touchUnthrottleKey, rectImage, ImageID("I_ARROW"))) {
-		unthrottle->SetAngle(180.0f);
-	}
-	if (auto *speed1 = addDragDropButton(g_Config.touchSpeed1Key, rectImage, ImageID("I_ARROW"))) {
-		speed1->SetAngle(170.0f, 180.0f);
-	}
-	if (auto *speed2 = addDragDropButton(g_Config.touchSpeed2Key, rectImage, ImageID("I_ARROW"))) {
-		speed2->SetAngle(190.0f, 180.0f);
-	}
-	if (auto *rapidFire = addDragDropButton(g_Config.touchRapidFireKey, rectImage, ImageID("I_ARROW"))) {
-		rapidFire->SetAngle(90.0f, 180.0f);
-	}
-	if (auto *analogRotationCW = addDragDropButton(g_Config.touchAnalogRotationCWKey, rectImage, ImageID("I_ARROW"))) {
-		analogRotationCW->SetAngle(190.0f, 180.0f);
-	}
-	if (auto *analogRotationCCW = addDragDropButton(g_Config.touchAnalogRotationCCWKey, rectImage, ImageID("I_ARROW"))) {
-		analogRotationCCW->SetAngle(350.0f, 180.0f);
-	}
-
 	addDragDropButton(g_Config.touchLKey, shoulderImage, ImageID("I_L"));
 	if (auto *rbutton = addDragDropButton(g_Config.touchRKey, shoulderImage, ImageID("I_R"))) {
 		rbutton->FlipImageH(true);
