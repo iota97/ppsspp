@@ -70,6 +70,12 @@ void TouchControlVisibilityScreen::CreateViews() {
 	gridsettings.fillCells = true;
 	GridLayout *grid = vert->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
 
+	static const ImageID comboKeyImages[] = {
+		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
+		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
+		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
+	};
+
 	static const char* rightAnalogKey = "Right Analog Stick (tap to customize)";
 	toggles_.clear();
 	toggles_.push_back({ "Circle", &g_Config.bShowTouchCircle, ImageID("I_CIRCLE") });
@@ -84,11 +90,11 @@ void TouchControlVisibilityScreen::CreateViews() {
 	toggles_.push_back({ "Analog Stick", &g_Config.touchAnalogStick.show, ImageID::invalid() });
 	toggles_.push_back({ rightAnalogKey, &g_Config.touchRightAnalogStick.show, ImageID::invalid() });
 	toggles_.push_back({ "Unthrottle", &g_Config.touchUnthrottleKey.show, ImageID::invalid() });
-	toggles_.push_back({ "Combo0", &g_Config.touchCombo0.show, ImageID("I_1") });
-	toggles_.push_back({ "Combo1", &g_Config.touchCombo1.show, ImageID("I_2") });
-	toggles_.push_back({ "Combo2", &g_Config.touchCombo2.show, ImageID("I_3") });
-	toggles_.push_back({ "Combo3", &g_Config.touchCombo3.show, ImageID("I_4") });
-	toggles_.push_back({ "Combo4", &g_Config.touchCombo4.show, ImageID("I_5") });
+	toggles_.push_back({ "Combo0", &g_Config.touchCombo0.show, comboKeyImages[g_Config.iCombokeyImage0] });
+	toggles_.push_back({ "Combo1", &g_Config.touchCombo1.show, comboKeyImages[g_Config.iCombokeyImage1] });
+	toggles_.push_back({ "Combo2", &g_Config.touchCombo2.show, comboKeyImages[g_Config.iCombokeyImage2] });
+	toggles_.push_back({ "Combo3", &g_Config.touchCombo3.show, comboKeyImages[g_Config.iCombokeyImage3] });
+	toggles_.push_back({ "Combo4", &g_Config.touchCombo4.show, comboKeyImages[g_Config.iCombokeyImage4] });
 	toggles_.push_back({ "Alt speed 1", &g_Config.touchSpeed1Key.show, ImageID::invalid() });
 	toggles_.push_back({ "Alt speed 2", &g_Config.touchSpeed2Key.show, ImageID::invalid() });
 	toggles_.push_back({ "RapidFire", &g_Config.touchRapidFireKey.show, ImageID::invalid() });

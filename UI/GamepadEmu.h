@@ -209,7 +209,6 @@ public:
 private:
 	int pspButtonBit_;
 	bool toggle_;
-	int keyId_;
 	EmuScreen* emuScreen_;
 	bool on_;
 };

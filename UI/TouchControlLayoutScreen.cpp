@@ -353,7 +353,11 @@ void ControlLayoutView::CreateViews() {
 	ImageID stickBg = g_Config.iTouchButtonStyle ? ImageID("I_STICK_BG_LINE") : ImageID("I_STICK_BG");
 	ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
 
-	const ImageID comboKeyImages[5] = { ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5") };
+	static const ImageID comboKeyImages[] = {
+		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
+		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
+		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
+	};
 
 	auto addDragDropButton = [&](ConfigTouchPos &pos, ImageID bgImg, ImageID img) {
 		DragDropButton *b = nullptr;
@@ -397,11 +401,11 @@ void ControlLayoutView::CreateViews() {
 
 	addDragDropButton(g_Config.touchAnalogStick, stickBg, stickImage);
 	addDragDropButton(g_Config.touchRightAnalogStick, stickBg, stickImage);
-	addDragDropButton(g_Config.touchCombo0, roundImage, comboKeyImages[0]);
-	addDragDropButton(g_Config.touchCombo1, roundImage, comboKeyImages[1]);
-	addDragDropButton(g_Config.touchCombo2, roundImage, comboKeyImages[2]);
-	addDragDropButton(g_Config.touchCombo3, roundImage, comboKeyImages[3]);
-	addDragDropButton(g_Config.touchCombo4, roundImage, comboKeyImages[4]);
+	addDragDropButton(g_Config.touchCombo0, roundImage, comboKeyImages[g_Config.iCombokeyImage0]);
+	addDragDropButton(g_Config.touchCombo1, roundImage, comboKeyImages[g_Config.iCombokeyImage1]);
+	addDragDropButton(g_Config.touchCombo2, roundImage, comboKeyImages[g_Config.iCombokeyImage2]);
+	addDragDropButton(g_Config.touchCombo3, roundImage, comboKeyImages[g_Config.iCombokeyImage3]);
+	addDragDropButton(g_Config.touchCombo4, roundImage, comboKeyImages[g_Config.iCombokeyImage4]);
 
 	for (size_t i = 0; i < controls_.size(); i++) {
 		Add(controls_[i]);

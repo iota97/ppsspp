@@ -36,6 +36,7 @@
 void ComboKeyScreen::CreateViews() {
 	using namespace UI;
 	auto co = GetI18NCategory("Controls");
+	auto mc = GetI18NCategory("MappableControls");
 	root_ = new LinearLayout(ORIENT_VERTICAL);
 	root_->Add(new ItemHeader(co->T("Combo Key Setting")));
 	LinearLayout *root__ = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(1.0));
@@ -43,15 +44,20 @@ void ComboKeyScreen::CreateViews() {
 	LinearLayout *leftColumn = new LinearLayout(ORIENT_VERTICAL, new LinearLayoutParams(120, FILL_PARENT));
 	auto di = GetI18NCategory("Dialog");
 
-	static const ImageID comboKeyImages[5] = {
+	static const ImageID comboKeyImages[] = {
 		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
+		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
+		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
 	};
 
 	comboselect = new ChoiceStrip(ORIENT_VERTICAL, new AnchorLayoutParams(10, 10, NONE, NONE));
 	comboselect->SetSpacing(10);
-	for (int i = 0; i < 5; i++) {
-		comboselect->AddChoice(comboKeyImages[i]);
-	}
+	comboselect->AddChoice(comboKeyImages[g_Config.iCombokeyImage0]);
+	comboselect->AddChoice(comboKeyImages[g_Config.iCombokeyImage1]);
+	comboselect->AddChoice(comboKeyImages[g_Config.iCombokeyImage2]);
+	comboselect->AddChoice(comboKeyImages[g_Config.iCombokeyImage3]);
+	comboselect->AddChoice(comboKeyImages[g_Config.iCombokeyImage4]);
+
 	comboselect->SetSelection(*mode);
 	comboselect->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
 	leftColumn->Add(comboselect);
@@ -60,46 +66,69 @@ void ComboKeyScreen::CreateViews() {
 	leftColumn->Add(new Spacer(new LinearLayoutParams(1.0f)));
 	leftColumn->Add(new Choice(di->T("Back")))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
 	root__->Add(rightScroll_);
-	
-	const int cellSize = 400;
 
+	const int cellSize = 400;
 	UI::GridLayoutSettings gridsettings(cellSize, 64, 5);
 	gridsettings.fillCells = true;
 	GridLayout *grid = rightScroll_->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
 
 	bool *toggle = nullptr;
+	int *image = nullptr;
 	memset(array, 0, sizeof(array));
 	switch (*mode) {
 	case 0: 
 		toggle = &g_Config.bComboToggle0;
+		image = &g_Config.iCombokeyImage0;
 		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey0 >> i) & 0x01));
 		break;
 	case 1:
 		toggle = &g_Config.bComboToggle1;
+		image = &g_Config.iCombokeyImage1;
 		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey1 >> i) & 0x01));
 		break;
 	case 2:
 		toggle = &g_Config.bComboToggle2;
+		image = &g_Config.iCombokeyImage2;
 		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey2 >> i) & 0x01));
 		break;
 	case 3:
 		toggle = &g_Config.bComboToggle3;
+		image = &g_Config.iCombokeyImage3;
 		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey3 >> i) & 0x01));
 		break;
 	case 4:
 		toggle = &g_Config.bComboToggle4;
+		image = &g_Config.iCombokeyImage4;
 		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey4 >> i) & 0x01));
 		break;
 	default:
 		// This shouldn't happen, let's just not crash.
 		toggle = &g_Config.bComboToggle0;
+		image = &g_Config.iCombokeyImage0;
 		break;
 	}
+	
+	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow" };
+	PopupMultiChoice *icon = grid->Add(new PopupMultiChoice(image, co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
+	icon->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
+
+	LinearLayout *row = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(FILL_PARENT, WRAP_CONTENT));
+	row->SetSpacing(0);
+
+	CheckBox *checkbox = new CheckBox(toggle, "", "", new LinearLayoutParams(50, WRAP_CONTENT));
+	row->Add(checkbox);
+
+	Choice *choice = new Choice(mc->T("Toggle mode"), new LinearLayoutParams(1.0f));
+	ChoiceEventHandler *choiceEventHandler = new ChoiceEventHandler(checkbox);
+	choice->OnClick.Handle(choiceEventHandler, &ChoiceEventHandler::onChoiceClick);
+	choice->SetCentered(true);
+	row->Add(choice);
+	grid->Add(row);
 
 	std::map<std::string, ImageID> keyImages;
 	keyImages["Circle"] = ImageID("I_CIRCLE");
@@ -144,8 +173,6 @@ void ComboKeyScreen::CreateViews() {
 
 	std::map<std::string, ImageID>::iterator imageFinder;
 
-	auto mc = GetI18NCategory("MappableControls");
-
 	for (int i = 0; i < keyToggles.size(); ++i) {
 		LinearLayout *row = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(FILL_PARENT, WRAP_CONTENT));
 		row->SetSpacing(0);
@@ -171,20 +198,6 @@ void ComboKeyScreen::CreateViews() {
 		grid->Add(row);
 
 	}
-
-	LinearLayout *row = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(FILL_PARENT, WRAP_CONTENT));
-	row->SetSpacing(0);
-
-	CheckBox *checkbox = new CheckBox(toggle, "", "", new LinearLayoutParams(50, WRAP_CONTENT));
-	row->Add(checkbox);
-
-	Choice *choice = new Choice(mc->T("Toggle mode"), new LinearLayoutParams(1.0f));
-	ChoiceEventHandler *choiceEventHandler = new ChoiceEventHandler(checkbox);
-	choice->OnClick.Handle(choiceEventHandler, &ChoiceEventHandler::onChoiceClick);
-	choice->SetCentered(true);
-
-	row->Add(choice);
-	grid->Add(row);
 }
 
 static int arrayToInt(bool ary[29]) {

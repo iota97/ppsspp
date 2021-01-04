@@ -375,6 +375,12 @@ public:
 	bool bComboToggle3;
 	bool bComboToggle4;
 
+	int iCombokeyImage0;
+	int iCombokeyImage1;
+	int iCombokeyImage2;
+	int iCombokeyImage3;
+	int iCombokeyImage4;
+
 	// Ignored on iOS and other platforms that lack pause.
 	bool bShowTouchPause;
 

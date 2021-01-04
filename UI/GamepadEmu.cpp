@@ -269,28 +269,20 @@ void ComboKey::Touch(const TouchInput &input) {
 		VIRTKEY_ANALOG_ROTATE_CCW
 	};
 
-	if (down || lastDown) {
+	if (down && !lastDown) {
+		if (g_Config.bHapticFeedback)
+			Vibrate(HAPTIC_VIRTUAL_KEY);
 		for (int i = 0; i < sizeof(keyList)/sizeof(keyList[0]); i++) {
 			if (pspButtonBit_ & (1 << i)) {
-				if (down && !lastDown) {
-					if (g_Config.bHapticFeedback) {
-						Vibrate(HAPTIC_VIRTUAL_KEY);
-					}
-					if (!toggle_) {
-						emuScreen_->pspKey(keyList[i], KEY_DOWN);
-					} else {
-						if (on_) {
-							emuScreen_->pspKey(keyList[i], KEY_UP);
-							on_ = false;
-						} else {
-							emuScreen_->pspKey(keyList[i], KEY_DOWN);
-							on_ = true;
-						}
-					}
-				}
-				else if (lastDown && !down && !toggle_) {
-					emuScreen_->pspKey(keyList[i], KEY_UP);
-				}
+				emuScreen_->pspKey(keyList[i], (on_ && toggle_) ? KEY_UP : KEY_DOWN);
+			}
+		}
+		if (toggle_)
+			on_ = !on_;
+	} else if (!toggle_ && lastDown && !down) {
+		for (int i = 0; i < sizeof(keyList)/sizeof(keyList[0]); i++) {
+			if (pspButtonBit_ & (1 << i)) {
+				emuScreen_->pspKey(keyList[i], KEY_UP);
 			}
 		}
 	}
@@ -808,7 +800,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	const ImageID dirImage = g_Config.iTouchButtonStyle ? ImageID("I_DIR_LINE") : ImageID("I_DIR");
 	const ImageID stickImage = g_Config.iTouchButtonStyle ? ImageID("I_STICK_LINE") : ImageID("I_STICK");
 	const ImageID stickBg = g_Config.iTouchButtonStyle ? ImageID("I_STICK_BG_LINE") : ImageID("I_STICK_BG");
-	static const ImageID comboKeyImages[5] = { ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5") };
+	static const ImageID comboKeyImages[] = {
+		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
+		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
+		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
+	};
 
 	auto addPSPButton = [=](int buttonBit, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch, ButtonOffset off = { 0, 0 }) -> PSPButton * {
 		if (touch.show) {
@@ -903,11 +899,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 			root->Add(new PSPStick(stickBg, stickImage, ImageID("I_STICK"), 1, g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
 	}
 
-	addComboKey(g_Config.iCombokey0, g_Config.bComboToggle0, roundImage, ImageID("I_ROUND"), comboKeyImages[0], g_Config.touchCombo0);
-	addComboKey(g_Config.iCombokey1, g_Config.bComboToggle1, roundImage, ImageID("I_ROUND"), comboKeyImages[1], g_Config.touchCombo1);
-	addComboKey(g_Config.iCombokey2, g_Config.bComboToggle2, roundImage, ImageID("I_ROUND"), comboKeyImages[2], g_Config.touchCombo2);
-	addComboKey(g_Config.iCombokey3, g_Config.bComboToggle3, roundImage, ImageID("I_ROUND"), comboKeyImages[3], g_Config.touchCombo3);
-	addComboKey(g_Config.iCombokey4, g_Config.bComboToggle4, roundImage, ImageID("I_ROUND"), comboKeyImages[4], g_Config.touchCombo4);
+	addComboKey(g_Config.iCombokey0, g_Config.bComboToggle0, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage0], g_Config.touchCombo0);
+	addComboKey(g_Config.iCombokey1, g_Config.bComboToggle1, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage1], g_Config.touchCombo1);
+	addComboKey(g_Config.iCombokey2, g_Config.bComboToggle2, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage2], g_Config.touchCombo2);
+	addComboKey(g_Config.iCombokey3, g_Config.bComboToggle3, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage3], g_Config.touchCombo3);
+	addComboKey(g_Config.iCombokey4, g_Config.bComboToggle4, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage4], g_Config.touchCombo4);
 
 	return root;
 }
