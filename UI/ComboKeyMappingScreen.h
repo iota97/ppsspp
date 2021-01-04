@@ -27,15 +27,16 @@ namespace UI {
 
 class ComboKeyScreen : public UIDialogScreenWithBackground {
 public:
-	ComboKeyScreen(int *key): mode(key) {}
+	ComboKeyScreen(int id): id_(id) {}
 
 	void CreateViews() override;
 	void onFinish(DialogResult result) override;
 	UI::EventReturn onCombo(UI::EventParams &e);
 private:
-	std::map<std::string, bool*> keyToggles;
-	bool array[16];
-	int *mode;
+
+	void saveArray();
+	bool array[29];
+	int id_;
 	UI::ChoiceStrip *comboselect;
 	UI::ScrollView *rightScroll_;
 	class ChoiceEventHandler{

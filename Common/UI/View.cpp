@@ -486,7 +486,10 @@ void Choice::Draw(UIContext &dc) {
 	}
 
 	if (atlasImage_.isValid()) {
-		dc.Draw()->DrawImage(atlasImage_, bounds_.centerX(), bounds_.centerY(), 1.0f, style.fgColor, ALIGN_CENTER);
+		if (atlasImageBg_.isValid()) {
+			dc.Draw()->DrawImage(atlasImageBg_, bounds_.centerX(), bounds_.centerY(), 1.0f, style.fgColor, ALIGN_CENTER);
+		}
+		dc.Draw()->DrawImage(atlasImage_, bounds_.centerX(), bounds_.centerY(), 1.0f, style.fgColor, ALIGN_CENTER);	
 	} else {
 		dc.SetFontStyle(dc.theme->uiFont);
 

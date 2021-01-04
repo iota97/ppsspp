@@ -353,7 +353,11 @@ void ControlLayoutView::CreateViews() {
 	ImageID stickBg = g_Config.iTouchButtonStyle ? ImageID("I_STICK_BG_LINE") : ImageID("I_STICK_BG");
 	ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
 
-	const ImageID comboKeyImages[5] = { ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5") };
+	static const ImageID comboKeyImages[] = {
+		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
+		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
+		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
+	};
 
 	auto addDragDropButton = [&](ConfigTouchPos &pos, ImageID bgImg, ImageID img) {
 		DragDropButton *b = nullptr;
@@ -397,11 +401,26 @@ void ControlLayoutView::CreateViews() {
 
 	addDragDropButton(g_Config.touchAnalogStick, stickBg, stickImage);
 	addDragDropButton(g_Config.touchRightAnalogStick, stickBg, stickImage);
-	addDragDropButton(g_Config.touchCombo0, roundImage, comboKeyImages[0]);
-	addDragDropButton(g_Config.touchCombo1, roundImage, comboKeyImages[1]);
-	addDragDropButton(g_Config.touchCombo2, roundImage, comboKeyImages[2]);
-	addDragDropButton(g_Config.touchCombo3, roundImage, comboKeyImages[3]);
-	addDragDropButton(g_Config.touchCombo4, roundImage, comboKeyImages[4]);
+
+	auto addDragComboKey = [&](ConfigTouchPos &pos, const ConfigCustomButton& cfg) {
+		DragDropButton *b = nullptr;
+		if (pos.show) {
+			b = new DragDropButton(pos, cfg.shape ? rectImage : roundImage, comboKeyImages[cfg.image], bounds);
+			b->SetAngle(cfg.rotation, 180.f);
+			controls_.push_back(b);
+		}
+		return b;
+	};
+	addDragComboKey(g_Config.touchCombo0, g_Config.CustomKey0);
+	addDragComboKey(g_Config.touchCombo1, g_Config.CustomKey1);
+	addDragComboKey(g_Config.touchCombo2, g_Config.CustomKey2);
+	addDragComboKey(g_Config.touchCombo3, g_Config.CustomKey3);
+	addDragComboKey(g_Config.touchCombo4, g_Config.CustomKey4);
+	addDragComboKey(g_Config.touchCombo5, g_Config.CustomKey5);
+	addDragComboKey(g_Config.touchCombo6, g_Config.CustomKey6);
+	addDragComboKey(g_Config.touchCombo7, g_Config.CustomKey7);
+	addDragComboKey(g_Config.touchCombo8, g_Config.CustomKey8);
+	addDragComboKey(g_Config.touchCombo9, g_Config.CustomKey9);
 
 	for (size_t i = 0; i < controls_.size(); i++) {
 		Add(controls_[i]);
@@ -497,7 +516,7 @@ void TouchControlLayoutScreen::CreateViews() {
 
 	Choice *reset = new Choice(di->T("Reset"), "", false, new AnchorLayoutParams(leftColumnWidth, WRAP_CONTENT, 10, NONE, NONE, 84));
 	Choice *back = new Choice(di->T("Back"), "", false, new AnchorLayoutParams(leftColumnWidth, WRAP_CONTENT, 10, NONE, NONE, 10));
-	Choice *visibility = new Choice(co->T("Visibility"), "", false, new AnchorLayoutParams(leftColumnWidth, WRAP_CONTENT, 10, NONE, NONE, 298));
+	Choice *visibility = new Choice(co->T("Customize"), "", false, new AnchorLayoutParams(leftColumnWidth, WRAP_CONTENT, 10, NONE, NONE, 298));
 	// controlsSettings->Add(new PopupSliderChoiceFloat(&g_Config.fButtonScale, 0.80, 2.0, co->T("Button Scaling"), screenManager()))
 	// 	->OnChange.Handle(this, &GameSettingsScreen::OnChangeControlScaling);
 
