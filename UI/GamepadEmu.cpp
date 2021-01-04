@@ -899,11 +899,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 			root->Add(new PSPStick(stickBg, stickImage, ImageID("I_STICK"), 1, g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
 	}
 
-	addComboKey(g_Config.iCombokey0, g_Config.bComboToggle0, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage0], g_Config.touchCombo0);
-	addComboKey(g_Config.iCombokey1, g_Config.bComboToggle1, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage1], g_Config.touchCombo1);
-	addComboKey(g_Config.iCombokey2, g_Config.bComboToggle2, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage2], g_Config.touchCombo2);
-	addComboKey(g_Config.iCombokey3, g_Config.bComboToggle3, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage3], g_Config.touchCombo3);
-	addComboKey(g_Config.iCombokey4, g_Config.bComboToggle4, roundImage, ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage4], g_Config.touchCombo4);
+	addComboKey(g_Config.iCombokey0, g_Config.bComboToggle0, g_Config.iComboShape0 ? rectImage : roundImage, g_Config.iComboShape0 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage0], g_Config.touchCombo0);
+	addComboKey(g_Config.iCombokey1, g_Config.bComboToggle1, g_Config.iComboShape1 ? rectImage : roundImage, g_Config.iComboShape1 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage1], g_Config.touchCombo1);
+	addComboKey(g_Config.iCombokey2, g_Config.bComboToggle2, g_Config.iComboShape2 ? rectImage : roundImage, g_Config.iComboShape2 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage2], g_Config.touchCombo2);
+	addComboKey(g_Config.iCombokey3, g_Config.bComboToggle3, g_Config.iComboShape3 ? rectImage : roundImage, g_Config.iComboShape3 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage3], g_Config.touchCombo3);
+	addComboKey(g_Config.iCombokey4, g_Config.bComboToggle4, g_Config.iComboShape4 ? rectImage : roundImage, g_Config.iComboShape4 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage4], g_Config.touchCombo4);
 
 	return root;
 }

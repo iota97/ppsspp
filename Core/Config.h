@@ -381,6 +381,12 @@ public:
 	int iCombokeyImage3;
 	int iCombokeyImage4;
 
+	int iComboShape0;
+	int iComboShape1;
+	int iComboShape2;
+	int iComboShape3;
+	int iComboShape4;	
+
 	// Ignored on iOS and other platforms that lack pause.
 	bool bShowTouchPause;
 

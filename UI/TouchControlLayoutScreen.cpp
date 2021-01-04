@@ -401,11 +401,11 @@ void ControlLayoutView::CreateViews() {
 
 	addDragDropButton(g_Config.touchAnalogStick, stickBg, stickImage);
 	addDragDropButton(g_Config.touchRightAnalogStick, stickBg, stickImage);
-	addDragDropButton(g_Config.touchCombo0, roundImage, comboKeyImages[g_Config.iCombokeyImage0]);
-	addDragDropButton(g_Config.touchCombo1, roundImage, comboKeyImages[g_Config.iCombokeyImage1]);
-	addDragDropButton(g_Config.touchCombo2, roundImage, comboKeyImages[g_Config.iCombokeyImage2]);
-	addDragDropButton(g_Config.touchCombo3, roundImage, comboKeyImages[g_Config.iCombokeyImage3]);
-	addDragDropButton(g_Config.touchCombo4, roundImage, comboKeyImages[g_Config.iCombokeyImage4]);
+	addDragDropButton(g_Config.touchCombo0, g_Config.iComboShape0 ? rectImage : roundImage, comboKeyImages[g_Config.iCombokeyImage0]);
+	addDragDropButton(g_Config.touchCombo1, g_Config.iComboShape1 ? rectImage : roundImage, comboKeyImages[g_Config.iCombokeyImage1]);
+	addDragDropButton(g_Config.touchCombo2, g_Config.iComboShape2 ? rectImage : roundImage, comboKeyImages[g_Config.iCombokeyImage2]);
+	addDragDropButton(g_Config.touchCombo3, g_Config.iComboShape3 ? rectImage : roundImage, comboKeyImages[g_Config.iCombokeyImage3]);
+	addDragDropButton(g_Config.touchCombo4, g_Config.iComboShape4 ? rectImage : roundImage, comboKeyImages[g_Config.iCombokeyImage4]);
 
 	for (size_t i = 0; i < controls_.size(); i++) {
 		Add(controls_[i]);
