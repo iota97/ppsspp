@@ -62,7 +62,7 @@ void ComboKeyScreen::CreateViews() {
 	comboselect->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
 	leftColumn->Add(comboselect);
 	root__->Add(leftColumn);
-	rightScroll_ = new ScrollView(ORIENT_VERTICAL, new LinearLayoutParams(FILL_PARENT, FILL_PARENT, 1.0f));
+	rightScroll_ = new ScrollView(ORIENT_VERTICAL, new LinearLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 1.0f));
 	leftColumn->Add(new Spacer(new LinearLayoutParams(1.0f)));
 	leftColumn->Add(new Choice(di->T("Back")))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
 	root__->Add(rightScroll_);
@@ -70,7 +70,8 @@ void ComboKeyScreen::CreateViews() {
 	const int cellSize = 400;
 	UI::GridLayoutSettings gridsettings(cellSize, 64, 5);
 	gridsettings.fillCells = true;
-	GridLayout *grid = rightScroll_->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
+	LinearLayout *vertLayout = new LinearLayout(ORIENT_VERTICAL);
+	rightScroll_->Add(vertLayout);
 
 	bool *toggle = nullptr;
 	int *image = nullptr;
@@ -121,24 +122,13 @@ void ComboKeyScreen::CreateViews() {
 	}
 	
 	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow" };
-	PopupMultiChoice *icon = grid->Add(new PopupMultiChoice(image, co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
+	PopupMultiChoice *icon = vertLayout->Add(new PopupMultiChoice(image, co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
 	icon->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
-
 	static const char *shapeNames[] = { "Circle", "Rectangle" };
-	grid->Add(new PopupMultiChoice(shape, co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()));
+	vertLayout->Add(new PopupMultiChoice(shape, co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()));
+	vertLayout->Add(new CheckBox(toggle, co->T("Toggle mode")));
 
-	LinearLayout *row = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(FILL_PARENT, WRAP_CONTENT));
-	row->SetSpacing(0);
-
-	CheckBox *checkbox = new CheckBox(toggle, "", "", new LinearLayoutParams(50, WRAP_CONTENT));
-	row->Add(checkbox);
-
-	Choice *choice = new Choice(mc->T("Toggle mode"), new LinearLayoutParams(1.0f));
-	ChoiceEventHandler *choiceEventHandler = new ChoiceEventHandler(checkbox);
-	choice->OnClick.Handle(choiceEventHandler, &ChoiceEventHandler::onChoiceClick);
-	choice->SetCentered(true);
-	row->Add(choice);
-	grid->Add(row);
+	GridLayout *grid = vertLayout->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
 
 	std::map<std::string, ImageID> keyImages;
 	keyImages["Circle"] = ImageID("I_CIRCLE");
@@ -206,7 +196,6 @@ void ComboKeyScreen::CreateViews() {
 
 		row->Add(choice);
 		grid->Add(row);
-
 	}
 }
 
