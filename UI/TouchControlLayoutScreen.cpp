@@ -359,6 +359,12 @@ void ControlLayoutView::CreateViews() {
 		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
 	};
 
+	static const ImageID comboKeyShape[][2] = {
+		{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
+		{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
+		{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") }
+	};
+
 	auto addDragDropButton = [&](ConfigTouchPos &pos, ImageID bgImg, ImageID img) {
 		DragDropButton *b = nullptr;
 		if (pos.show) {
@@ -405,8 +411,9 @@ void ControlLayoutView::CreateViews() {
 	auto addDragComboKey = [&](ConfigTouchPos &pos, const ConfigCustomButton& cfg) {
 		DragDropButton *b = nullptr;
 		if (pos.show) {
-			b = new DragDropButton(pos, cfg.shape ? rectImage : roundImage, comboKeyImages[cfg.image], bounds);
-			b->SetAngle(cfg.rotation, 180.f);
+			b = new DragDropButton(pos, comboKeyShape[cfg.shape][g_Config.iTouchButtonStyle != 0], comboKeyImages[cfg.image], bounds);
+			b->FlipImageH(cfg.flip);
+			b->SetAngle(cfg.rotation, 0.f);
 			controls_.push_back(b);
 		}
 		return b;

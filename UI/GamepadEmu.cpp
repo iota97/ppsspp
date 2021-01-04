@@ -818,7 +818,6 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	const int halfW = xres / 2;
 
 	const ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
-
 	const ImageID rectImage = g_Config.iTouchButtonStyle ? ImageID("I_RECT_LINE") : ImageID("I_RECT");
 	const ImageID shoulderImage = g_Config.iTouchButtonStyle ? ImageID("I_SHOULDER_LINE") : ImageID("I_SHOULDER");
 	const ImageID dirImage = g_Config.iTouchButtonStyle ? ImageID("I_DIR_LINE") : ImageID("I_DIR");
@@ -830,6 +829,12 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
 	};
 
+	static const ImageID comboKeyShape[][2] = {
+		{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
+		{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
+		{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") }
+	};
+
 	auto addPSPButton = [=](int buttonBit, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch, ButtonOffset off = { 0, 0 }) -> PSPButton * {
 		if (touch.show) {
 			return root->Add(new PSPButton(buttonBit, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch, off)));
@@ -839,9 +844,10 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	auto addComboKey = [=](const ConfigCustomButton& cfg, const ConfigTouchPos &touch) -> ComboKey * {
 		if (touch.show) {
 			auto aux = root->Add(new ComboKey(cfg.key, cfg.toggle, emuScreen, 
-					cfg.shape ? rectImage : roundImage, cfg.shape ? ImageID("I_RECT") : ImageID("I_ROUND"), 
+					comboKeyShape[cfg.shape][g_Config.iTouchButtonStyle != 0], comboKeyShape[cfg.shape][0], 
 					comboKeyImages[cfg.image], touch.scale, buttonLayoutParams(touch)));
-			aux->SetAngle(cfg.rotation, 180.0f);
+			aux->SetAngle(cfg.rotation, 0.0f);
+			aux->FlipImageH(cfg.flip);
 			return aux;
 		}
 		return nullptr;

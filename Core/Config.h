@@ -59,6 +59,7 @@ struct ConfigCustomButton {
 	int shape;
 	float rotation;
 	bool toggle;
+	bool flip;
 };
 
 struct Config {

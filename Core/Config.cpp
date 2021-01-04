@@ -177,8 +177,8 @@ struct ConfigSetting {
 		default_.touchPos = def;
 	}
 
-	ConfigSetting(const char *iniKey, const char *iniImage, const char *iniShape, const char *iniRotation, const char *iniToggle, ConfigCustomButton *v, ConfigCustomButton def, bool save = true, bool perGame = false)
-		: ini_(iniKey), ini2_(iniImage), ini3_(iniShape), ini4_(iniRotation), ini5_(iniToggle), type_(TYPE_CUSTOM_BUTTON), report_(false), save_(save), perGame_(perGame) {
+	ConfigSetting(const char *iniKey, const char *iniImage, const char *iniShape, const char *iniRotation, const char *iniToggle, const char *iniFlip, ConfigCustomButton *v, ConfigCustomButton def, bool save = true, bool perGame = false)
+		: ini_(iniKey), ini2_(iniImage), ini3_(iniShape), ini4_(iniRotation), ini5_(iniToggle), ini6_(iniFlip), type_(TYPE_CUSTOM_BUTTON), report_(false), save_(save), perGame_(perGame) {
 		ptr_.customButton = v;
 		cb_.customButton = nullptr;
 		default_.customButton = def;
@@ -291,6 +291,7 @@ struct ConfigSetting {
 			section->Get(ini3_, &ptr_.customButton->shape, default_.customButton.shape);
 			section->Get(ini4_, &ptr_.customButton->rotation, default_.customButton.rotation);
 			section->Get(ini5_, &ptr_.customButton->toggle, default_.customButton.toggle);
+			section->Get(ini6_, &ptr_.customButton->flip, default_.customButton.flip);
 			return true;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
@@ -333,6 +334,7 @@ struct ConfigSetting {
 			section->Set(ini3_, ptr_.customButton->shape);
 			section->Set(ini4_, ptr_.customButton->rotation);
 			section->Set(ini5_, ptr_.customButton->toggle);
+			section->Set(ini6_, ptr_.customButton->flip);
 			return;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
@@ -374,6 +376,7 @@ struct ConfigSetting {
 	const char *ini3_;
 	const char *ini4_;
 	const char *ini5_;
+	const char *ini6_;
 	Type type_;
 	bool report_;
 	bool save_;
@@ -920,16 +923,16 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("ShowTouchSquare", &g_Config.bShowTouchSquare, true, true, true),
 	ConfigSetting("ShowTouchTriangle", &g_Config.bShowTouchTriangle, true, true, true),
 
-	ConfigSetting("Custom0Mapping", "Custom0Image", "Custom0Shape", "Custom0Rotation", "Custom0Toggle", &g_Config.CustomKey0, {0, 0, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom1Mapping", "Custom1Image", "Custom1Shape", "Custom1Rotation",  "Custom1Toggle", &g_Config.CustomKey1, {0, 1, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom2Mapping", "Custom2Image", "Custom2Shape", "Custom2Rotation",  "Custom2Toggle", &g_Config.CustomKey2, {0, 2, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom3Mapping", "Custom3Image", "Custom3Shape", "Custom3Rotation",  "Custom3Toggle", &g_Config.CustomKey3, {0, 3, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom4Mapping", "Custom4Image", "Custom4Shape", "Custom4Rotation",  "Custom4Toggle", &g_Config.CustomKey4, {0, 4, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom5Mapping", "Custom5Image", "Custom5Shape", "Custom5Rotation",  "Custom5Toggle", &g_Config.CustomKey5, {0, 0, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom6Mapping", "Custom6Image", "Custom6Shape", "Custom6Rotation",  "Custom6Toggle", &g_Config.CustomKey6, {0, 1, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom7Mapping", "Custom7Image", "Custom7Shape", "Custom7Rotation",  "Custom7Toggle", &g_Config.CustomKey7, {0, 2, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom8Mapping", "Custom8Image", "Custom8Shape", "Custom8Rotation",  "Custom8Toggle", &g_Config.CustomKey8, {0, 3, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom9Mapping", "Custom9Image", "Custom9Shape", "Custom9Rotation",  "Custom9Toggle", &g_Config.CustomKey9, {0, 4, 1, 0.0f, false}, true, true),
+	ConfigSetting("Custom0Mapping", "Custom0Image", "Custom0Shape", "Custom0Rotation", "Custom0Toggle", "Custom0Flip", &g_Config.CustomKey0, {0, 0, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom1Mapping", "Custom1Image", "Custom1Shape", "Custom1Rotation", "Custom1Toggle", "Custom1Flip", &g_Config.CustomKey1, {0, 1, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom2Mapping", "Custom2Image", "Custom2Shape", "Custom2Rotation", "Custom2Toggle", "Custom2Flip", &g_Config.CustomKey2, {0, 2, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom3Mapping", "Custom3Image", "Custom3Shape", "Custom3Rotation", "Custom3Toggle", "Custom3Flip", &g_Config.CustomKey3, {0, 3, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom4Mapping", "Custom4Image", "Custom4Shape", "Custom4Rotation", "Custom4Toggle", "Custom4Flip", &g_Config.CustomKey4, {0, 4, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom5Mapping", "Custom5Image", "Custom5Shape", "Custom5Rotation", "Custom5Toggle", "Custom5Flip", &g_Config.CustomKey5, {0, 0, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom6Mapping", "Custom6Image", "Custom6Shape", "Custom6Rotation", "Custom6Toggle", "Custom6Flip", &g_Config.CustomKey6, {0, 1, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom7Mapping", "Custom7Image", "Custom7Shape", "Custom7Rotation", "Custom7Toggle", "Custom7Flip", &g_Config.CustomKey7, {0, 2, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom8Mapping", "Custom8Image", "Custom8Shape", "Custom8Rotation", "Custom8Toggle", "Custom8Flip", &g_Config.CustomKey8, {0, 3, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom9Mapping", "Custom9Image", "Custom9Shape", "Custom9Rotation", "Custom9Toggle", "Custom9Flip", &g_Config.CustomKey9, {0, 4, 1, 0.0f, false, false}, true, true),
 
 #if defined(_WIN32)
 	// A win32 user seeing touch controls is likely using PPSSPP on a tablet. There it makes
