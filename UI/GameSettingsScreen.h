@@ -239,3 +239,9 @@ private:
 	std::string lastResolved_ = "";
 	bool lastResolvedResult_ = false;
 };
+
+
+class GestureMappingScreen : public UIDialogScreenWithBackground {
+public:
+	void CreateViews() override;
+};
