@@ -158,68 +158,6 @@ void BoolButton::Touch(const TouchInput &input) {
 	}
 }
 
-void FPSLimitButton::Touch(const TouchInput &input) {
-	bool lastDown = pointerDownMask_ != 0;
-	MultiTouchButton::Touch(input);
-	bool down = pointerDownMask_ != 0;
-
-	if (!down && lastDown && IsDown()) {
-		PSP_CoreParameter().fpsLimit = FPSLimit::NORMAL;
-	} else if (down && !lastDown && PSP_CoreParameter().fpsLimit == FPSLimit::NORMAL) {
-		int limit = limit_ == FPSLimit::CUSTOM1 ? g_Config.iFpsLimit1 : g_Config.iFpsLimit2;
-		// Validate it actually has a setting (may this should override visible?)
-		if (limit >= 0) {
-			PSP_CoreParameter().fpsLimit = limit_;
-		}
-	}
-}
-
-bool FPSLimitButton::IsDown() {
-	return PSP_CoreParameter().fpsLimit == limit_;
-}
-
-void RapidFireButton::Touch(const TouchInput &input) {
-	bool lastDown = pointerDownMask_ != 0;
-	MultiTouchButton::Touch(input);
-	bool down = pointerDownMask_ != 0;
-	if (down && !lastDown) {
-		__CtrlSetRapidFire(!__CtrlGetRapidFire());
-	}
-}
-
-bool RapidFireButton::IsDown() {
-	return __CtrlGetRapidFire();
-}
-
-void AnalogRotationButton::Touch(const TouchInput &input) {
-	bool lastDown = pointerDownMask_ != 0;
-	MultiTouchButton::Touch(input);
-	bool down = pointerDownMask_ != 0;
-	if (down && !lastDown) {
-		autoRotating_ = true;
-	} else if (lastDown && !down) {
-		autoRotating_ = false;
-		__CtrlSetAnalogX(0.0f, 0);
-		__CtrlSetAnalogY(0.0f, 0);
-	}
-}
-
-void AnalogRotationButton::Update() {
-	const float now = time_now_d();
-	float delta = now - lastFrameTime_;
-	if (delta > 0) {
-		secondsWithoutTouch_ += delta;
-	}
-	lastFrameTime_ = now;
-
-	if (autoRotating_) {
-		float speed = clockWise_ ? -g_Config.fAnalogAutoRotSpeed : g_Config.fAnalogAutoRotSpeed;
-		// Clamp to a square
-		__CtrlSetAnalogX(std::min(1.0f, std::max(-1.0f, 1.42f*cosf(now*speed))), 0);
-		__CtrlSetAnalogY(std::min(1.0f, std::max(-1.0f, 1.42f*sinf(now*speed))), 0);
-	}
-}
-
 void PSPButton::Touch(const TouchInput &input) {
 	bool lastDown = pointerDownMask_ != 0;
 	MultiTouchButton::Touch(input);
@@ -732,23 +670,13 @@ void InitPadLayout(float xres, float yres, float globalScale) {
 		bottom_key_spacing *= 0.8f;
 	}
 
-	int start_key_X = halfW + bottom_key_spacing * scale;
+	int start_key_X = halfW + bottom_key_spacing/2 * scale;
 	int start_key_Y = yres - 60 * scale;
 	initTouchPos(g_Config.touchStartKey, start_key_X, start_key_Y);
 
-	int select_key_X = halfW;
+	int select_key_X = halfW - bottom_key_spacing/2 * scale;
 	int select_key_Y = yres - 60 * scale;
 	initTouchPos(g_Config.touchSelectKey, select_key_X, select_key_Y);
-
-	int unthrottle_key_X = halfW - bottom_key_spacing * scale;
-	int unthrottle_key_Y = yres - 60 * scale;
-	initTouchPos(g_Config.touchUnthrottleKey, unthrottle_key_X, unthrottle_key_Y);
-
-	initTouchPos(g_Config.touchSpeed1Key, unthrottle_key_X, unthrottle_key_Y - 60 * scale);
-	initTouchPos(g_Config.touchSpeed2Key, unthrottle_key_X + bottom_key_spacing * scale, unthrottle_key_Y - 60 * scale);
-	initTouchPos(g_Config.touchRapidFireKey, unthrottle_key_X + 2*bottom_key_spacing * scale, unthrottle_key_Y - 60 * scale);
-	initTouchPos(g_Config.touchAnalogRotationCCWKey, unthrottle_key_X, unthrottle_key_Y - 120 * scale);
-	initTouchPos(g_Config.touchAnalogRotationCWKey, unthrottle_key_X + bottom_key_spacing * scale, unthrottle_key_Y - 120 * scale);
 
 	// L and R------------------------------------------------------------
 	// Put them above the analog stick / above the buttons to the right.
@@ -831,7 +759,6 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	const int halfW = xres / 2;
 
 	const ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
-
 	const ImageID rectImage = g_Config.iTouchButtonStyle ? ImageID("I_RECT_LINE") : ImageID("I_RECT");
 	const ImageID shoulderImage = g_Config.iTouchButtonStyle ? ImageID("I_SHOULDER_LINE") : ImageID("I_SHOULDER");
 	const ImageID dirImage = g_Config.iTouchButtonStyle ? ImageID("I_DIR_LINE") : ImageID("I_DIR");
@@ -843,6 +770,12 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
 	};
 
+	static const ImageID comboKeyShape[][2] = {
+		{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
+		{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
+		{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") }
+	};
+
 	auto addPSPButton = [=](int buttonBit, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch, ButtonOffset off = { 0, 0 }) -> PSPButton * {
 		if (touch.show) {
 			return root->Add(new PSPButton(buttonBit, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch, off)));
@@ -852,22 +785,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	auto addComboKey = [=](const ConfigCustomButton& cfg, const ConfigTouchPos &touch) -> ComboKey * {
 		if (touch.show) {
 			auto aux = root->Add(new ComboKey(cfg.key, cfg.toggle, emuScreen, 
-					cfg.shape ? rectImage : roundImage, cfg.shape ? ImageID("I_RECT") : ImageID("I_ROUND"), 
+					comboKeyShape[cfg.shape][g_Config.iTouchButtonStyle != 0], comboKeyShape[cfg.shape][0], 
 					comboKeyImages[cfg.image], touch.scale, buttonLayoutParams(touch)));
-			aux->SetAngle(cfg.rotation, 180.0f);
+			aux->SetAngle(cfg.rotation, 0.0f);
+			aux->FlipImageH(cfg.flip);
 			return aux;
-		}
-		return nullptr;
-	};
-	auto addBoolButton = [=](bool *value, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch) -> BoolButton * {
-		if (touch.show) {
-			return root->Add(new BoolButton(value, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch)));
-		}
-		return nullptr;
-	};
-	auto addFPSLimitButton = [=](FPSLimit value, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch) -> FPSLimitButton * {
-		if (touch.show) {
-			return root->Add(new FPSLimitButton(value, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch)));
 		}
 		return nullptr;
 	};
@@ -888,40 +810,6 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 
 	addPSPButton(CTRL_START, rectImage, ImageID("I_RECT"), ImageID("I_START"), g_Config.touchStartKey);
 	addPSPButton(CTRL_SELECT, rectImage, ImageID("I_RECT"), ImageID("I_SELECT"), g_Config.touchSelectKey);
-
-	BoolButton *unthrottle = addBoolButton(&PSP_CoreParameter().unthrottle, rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchUnthrottleKey);
-	if (unthrottle) {
-		unthrottle->SetAngle(180.0f);
-		unthrottle->OnChange.Add([](UI::EventParams &e) {
-			if (e.a && coreState == CORE_STEPPING) {
-				Core_EnableStepping(false);
-			}
-			return UI::EVENT_DONE;
-		});
-	}
-
-	if (g_Config.touchRapidFireKey.show) {
-		auto rapidFire = root->Add(new RapidFireButton(rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchRapidFireKey.scale, buttonLayoutParams(g_Config.touchRapidFireKey)));
-		rapidFire->SetAngle(90.0f, 180.0f);
-	}
-
-	if (g_Config.touchAnalogRotationCWKey.show) {
-		auto analogRotationCC = root->Add(new AnalogRotationButton(true, rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchAnalogRotationCWKey.scale, buttonLayoutParams(g_Config.touchAnalogRotationCWKey)));
-		analogRotationCC->SetAngle(190.0f, 180.0f);
-	}
-
-	if (g_Config.touchAnalogRotationCCWKey.show) {
-		auto analogRotationCCW = root->Add(new AnalogRotationButton(false, rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchAnalogRotationCCWKey.scale, buttonLayoutParams(g_Config.touchAnalogRotationCCWKey)));
-		analogRotationCCW->SetAngle(350.0f, 180.0f);
-	}
-
-	FPSLimitButton *speed1 = addFPSLimitButton(FPSLimit::CUSTOM1, rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchSpeed1Key);
-	if (speed1)
-		speed1->SetAngle(170.0f, 180.0f);
-	FPSLimitButton *speed2 = addFPSLimitButton(FPSLimit::CUSTOM2, rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchSpeed2Key);
-	if (speed2)
-		speed2->SetAngle(190.0f, 180.0f);
-
 	addPSPButton(CTRL_LTRIGGER, shoulderImage, ImageID("I_SHOULDER"), ImageID("I_L"), g_Config.touchLKey);
 	PSPButton *rTrigger = addPSPButton(CTRL_RTRIGGER, shoulderImage, ImageID("I_SHOULDER"), ImageID("I_R"), g_Config.touchRKey);
 	if (rTrigger)

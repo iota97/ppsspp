@@ -36,9 +36,9 @@
 
 class ButtonPreview : public MultiTouchButton {
 public:
-	ButtonPreview(ImageID bgImg, ImageID img, float rotation, int x, int y)
+	ButtonPreview(ImageID bgImg, ImageID img, float rotation, bool flip, int x, int y)
 	: MultiTouchButton(bgImg, bgImg, img, 1.0f, new UI::AnchorLayoutParams(x, y, UI::NONE, UI::NONE, true)),
-		x_(x), y_(y), rot_(rotation), bgImg_(bgImg), img_(img) {
+		x_(x), y_(y), rot_(rotation), bgImg_(bgImg), img_(img), flip_(flip) {
 	}
 	bool IsDown() override {
 		return false;
@@ -50,13 +50,14 @@ public:
 		uint32_t colorBg = colorAlpha(g_Config.iTouchButtonStyle != 0 ? 0xFFFFFF : 0xc0b080, opacity);
 		uint32_t color = colorAlpha(0xFFFFFF, opacity);
 
-		dc.Draw()->DrawImageRotated(bgImg_, x_, y_, 1.0f, 0, colorBg, false);
+		dc.Draw()->DrawImageRotated(bgImg_, x_, y_, 1.0f, 0, colorBg, flip_);
 		dc.Draw()->DrawImageRotated(img_, x_, y_, 1.0f, rot_*PI/180, color, false);
 	}
 private:
 	int x_;
 	int y_;
 	float rot_;
+	bool flip_;
 	ImageID bgImg_;
 	ImageID img_;
 };
@@ -76,6 +77,12 @@ void ComboKeyScreen::CreateViews() {
 		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
 		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
 		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
+	};
+
+	static const ImageID comboKeyShape[][2] = {
+		{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
+		{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
+		{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") }
 	};
 
 	ConfigCustomButton* cfg = nullptr;
@@ -149,10 +156,7 @@ void ComboKeyScreen::CreateViews() {
 		break;
 	}
 
-	ImageID rectImage = g_Config.iTouchButtonStyle ? ImageID("I_RECT_LINE") : ImageID("I_RECT");
-	ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
-
-	leftColumn->Add(new ButtonPreview(cfg->shape ? rectImage : roundImage, comboKeyImages[cfg->image], cfg->rotation, 62, 82));
+	leftColumn->Add(new ButtonPreview(comboKeyShape[cfg->shape][g_Config.iTouchButtonStyle != 0], comboKeyImages[cfg->image], cfg->rotation, cfg->flip, 62, 82));
 
 	root__->Add(leftColumn);
 	rightScroll_ = new ScrollView(ORIENT_VERTICAL, new LinearLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 1.0f));
@@ -166,6 +170,7 @@ void ComboKeyScreen::CreateViews() {
 	LinearLayout *vertLayout = new LinearLayout(ORIENT_VERTICAL);
 	rightScroll_->Add(vertLayout);
 	
+	vertLayout->Add(new ItemHeader(co->T("Button Style")));
 	vertLayout->Add(new CheckBox(show, co->T("Visible")));
 
 	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow" };
@@ -174,10 +179,13 @@ void ComboKeyScreen::CreateViews() {
 
 	vertLayout->Add(new PopupSliderChoiceFloat(&(cfg->rotation), -180.0f, 180.0f, co->T("Icon rotation"), 5.0f, screenManager()))->OnChange.Handle(this, &ComboKeyScreen::onCombo);
 	
-	static const char *shapeNames[] = { "Circle", "Rectangle" };
+	static const char *shapeNames[] = { "Circle", "Rectangle", "Shoulder button" };
 	vertLayout->Add(new PopupMultiChoice(&(cfg->shape), co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()))->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
-	vertLayout->Add(new CheckBox(&(cfg->toggle), co->T("Toggle mode")));
 
+	vertLayout->Add(new CheckBox(&(cfg->flip), co->T("Flip shape")))->OnClick.Handle(this, &ComboKeyScreen::onCombo);;
+
+	vertLayout->Add(new ItemHeader(co->T("Button Binding")));
+	vertLayout->Add(new CheckBox(&(cfg->toggle), co->T("Toggle mode")));
 	GridLayout *grid = vertLayout->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
 
 	std::map<std::string, ImageID> keyImages;

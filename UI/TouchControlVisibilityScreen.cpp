@@ -92,7 +92,6 @@ void TouchControlVisibilityScreen::CreateViews() {
 		screenManager()->push(new RightAnalogMappingScreen());
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Unthrottle", &g_Config.touchUnthrottleKey.show, ImageID::invalid(), nullptr });
 	toggles_.push_back({ "Custom 1", &g_Config.touchCombo0.show, comboKeyImages[g_Config.CustomKey0.image], [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(0));
 		return UI::EVENT_DONE;
@@ -133,11 +132,6 @@ void TouchControlVisibilityScreen::CreateViews() {
 		screenManager()->push(new ComboKeyScreen(9));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Alt speed 1", &g_Config.touchSpeed1Key.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "Alt speed 2", &g_Config.touchSpeed2Key.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "RapidFire", &g_Config.touchRapidFireKey.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "Auto Analog Rotation (CW)", &g_Config.touchAnalogRotationCWKey.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "Auto Analog Rotation (CCW)", &g_Config.touchAnalogRotationCCWKey.show, ImageID::invalid(), nullptr });
 
 	auto mc = GetI18NCategory("MappableControls");
 	for (auto toggle : toggles_) {

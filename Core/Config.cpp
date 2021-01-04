@@ -68,15 +68,17 @@ struct ConfigSetting {
 		TYPE_BOOL,
 		TYPE_INT,
 		TYPE_UINT32,
+		TYPE_UINT64,
 		TYPE_FLOAT,
 		TYPE_STRING,
 		TYPE_TOUCH_POS,
-		TYPE_CUSTOM_BUTTON,
+		TYPE_CUSTOM_BUTTON
 	};
 	union Value {
 		bool b;
 		int i;
 		uint32_t u;
+		uint64_t lu;
 		float f;
 		const char *s;
 		ConfigTouchPos touchPos;
@@ -86,6 +88,7 @@ struct ConfigSetting {
 		bool *b;
 		int *i;
 		uint32_t *u;
+		uint64_t *lu;
 		float *f;
 		std::string *s;
 		ConfigTouchPos *touchPos;
@@ -95,6 +98,7 @@ struct ConfigSetting {
 	typedef bool (*BoolDefaultCallback)();
 	typedef int (*IntDefaultCallback)();
 	typedef uint32_t (*Uint32DefaultCallback)();
+	typedef uint64_t (*Uint64DefaultCallback)();
 	typedef float (*FloatDefaultCallback)();
 	typedef const char *(*StringDefaultCallback)();
 	typedef ConfigTouchPos (*TouchPosDefaultCallback)();
@@ -104,6 +108,7 @@ struct ConfigSetting {
 		BoolDefaultCallback b;
 		IntDefaultCallback i;
 		Uint32DefaultCallback u;
+		Uint32DefaultCallback lu;
 		FloatDefaultCallback f;
 		StringDefaultCallback s;
 		TouchPosDefaultCallback touchPos;
@@ -144,6 +149,13 @@ struct ConfigSetting {
 		default_.u = def;
 	}
 
+	ConfigSetting(const char *ini, uint64_t *v, uint64_t def, bool save = true, bool perGame = false)
+		: ini_(ini), type_(TYPE_UINT64), report_(false), save_(save), perGame_(perGame) {
+		ptr_.lu = v;
+		cb_.lu = nullptr;
+		default_.lu = def;
+	}
+
 	ConfigSetting(const char *ini, float *v, float def, bool save = true, bool perGame = false)
 		: ini_(ini), type_(TYPE_FLOAT), report_(false), save_(save), perGame_(perGame) {
 		ptr_.f = v;
@@ -165,8 +177,8 @@ struct ConfigSetting {
 		default_.touchPos = def;
 	}
 
-	ConfigSetting(const char *iniKey, const char *iniImage, const char *iniShape, const char *iniRotation, const char *iniToggle, ConfigCustomButton *v, ConfigCustomButton def, bool save = true, bool perGame = false)
-		: ini_(iniKey), ini2_(iniImage), ini3_(iniShape), ini4_(iniRotation), ini5_(iniToggle), type_(TYPE_CUSTOM_BUTTON), report_(false), save_(save), perGame_(perGame) {
+	ConfigSetting(const char *iniKey, const char *iniImage, const char *iniShape, const char *iniRotation, const char *iniToggle, const char *iniFlip, ConfigCustomButton *v, ConfigCustomButton def, bool save = true, bool perGame = false)
+		: ini_(iniKey), ini2_(iniImage), ini3_(iniShape), ini4_(iniRotation), ini5_(iniToggle), ini6_(iniFlip), type_(TYPE_CUSTOM_BUTTON), report_(false), save_(save), perGame_(perGame) {
 		ptr_.customButton = v;
 		cb_.customButton = nullptr;
 		default_.customButton = def;
@@ -242,6 +254,11 @@ struct ConfigSetting {
 				default_.u = cb_.u();
 			}
 			return section->Get(ini_, ptr_.u, default_.u);
+		case TYPE_UINT64:
+			if (cb_.lu) {
+				default_.lu = cb_.lu();
+			}
+			return section->Get(ini_, ptr_.lu, default_.lu);
 		case TYPE_FLOAT:
 			if (cb_.f) {
 				default_.f = cb_.f();
@@ -274,6 +291,7 @@ struct ConfigSetting {
 			section->Get(ini3_, &ptr_.customButton->shape, default_.customButton.shape);
 			section->Get(ini4_, &ptr_.customButton->rotation, default_.customButton.rotation);
 			section->Get(ini5_, &ptr_.customButton->toggle, default_.customButton.toggle);
+			section->Get(ini6_, &ptr_.customButton->flip, default_.customButton.flip);
 			return true;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
@@ -296,6 +314,8 @@ struct ConfigSetting {
 			return section->Set(ini_, *ptr_.i);
 		case TYPE_UINT32:
 			return section->Set(ini_, *ptr_.u);
+		case TYPE_UINT64:
+			return section->Set(ini_, *ptr_.lu);
 		case TYPE_FLOAT:
 			return section->Set(ini_, *ptr_.f);
 		case TYPE_STRING:
@@ -314,6 +334,7 @@ struct ConfigSetting {
 			section->Set(ini3_, ptr_.customButton->shape);
 			section->Set(ini4_, ptr_.customButton->rotation);
 			section->Set(ini5_, ptr_.customButton->toggle);
+			section->Set(ini6_, ptr_.customButton->flip);
 			return;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
@@ -332,6 +353,8 @@ struct ConfigSetting {
 			return data.Add(prefix + ini_, *ptr_.i);
 		case TYPE_UINT32:
 			return data.Add(prefix + ini_, *ptr_.u);
+		case TYPE_UINT64:
+			return data.Add(prefix + ini_, *ptr_.lu);
 		case TYPE_FLOAT:
 			return data.Add(prefix + ini_, *ptr_.f);
 		case TYPE_STRING:
@@ -353,6 +376,7 @@ struct ConfigSetting {
 	const char *ini3_;
 	const char *ini4_;
 	const char *ini5_;
+	const char *ini6_;
 	Type type_;
 	bool report_;
 	bool save_;
@@ -907,16 +931,16 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("ShowTouchSquare", &g_Config.bShowTouchSquare, true, true, true),
 	ConfigSetting("ShowTouchTriangle", &g_Config.bShowTouchTriangle, true, true, true),
 
-	ConfigSetting("Custom0Mapping", "Custom0Image", "Custom0Shape", "Custom0Rotation", "Custom0Toggle", &g_Config.CustomKey0, {0, 0, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom1Mapping", "Custom1Image", "Custom1Shape", "Custom1Rotation",  "Custom1Toggle", &g_Config.CustomKey1, {0, 1, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom2Mapping", "Custom2Image", "Custom2Shape", "Custom2Rotation",  "Custom2Toggle", &g_Config.CustomKey2, {0, 2, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom3Mapping", "Custom3Image", "Custom3Shape", "Custom3Rotation",  "Custom3Toggle", &g_Config.CustomKey3, {0, 3, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom4Mapping", "Custom4Image", "Custom4Shape", "Custom4Rotation",  "Custom4Toggle", &g_Config.CustomKey4, {0, 4, 0, 0.0f, false}, true, true),
-	ConfigSetting("Custom5Mapping", "Custom5Image", "Custom5Shape", "Custom5Rotation",  "Custom5Toggle", &g_Config.CustomKey5, {0, 0, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom6Mapping", "Custom6Image", "Custom6Shape", "Custom6Rotation",  "Custom6Toggle", &g_Config.CustomKey6, {0, 1, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom7Mapping", "Custom7Image", "Custom7Shape", "Custom7Rotation",  "Custom7Toggle", &g_Config.CustomKey7, {0, 2, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom8Mapping", "Custom8Image", "Custom8Shape", "Custom8Rotation",  "Custom8Toggle", &g_Config.CustomKey8, {0, 3, 1, 0.0f, false}, true, true),
-	ConfigSetting("Custom9Mapping", "Custom9Image", "Custom9Shape", "Custom9Rotation",  "Custom9Toggle", &g_Config.CustomKey9, {0, 4, 1, 0.0f, false}, true, true),
+	ConfigSetting("Custom0Mapping", "Custom0Image", "Custom0Shape", "Custom0Rotation", "Custom0Toggle", "Custom0Flip", &g_Config.CustomKey0, {0, 0, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom1Mapping", "Custom1Image", "Custom1Shape", "Custom1Rotation", "Custom1Toggle", "Custom1Flip", &g_Config.CustomKey1, {0, 1, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom2Mapping", "Custom2Image", "Custom2Shape", "Custom2Rotation", "Custom2Toggle", "Custom2Flip", &g_Config.CustomKey2, {0, 2, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom3Mapping", "Custom3Image", "Custom3Shape", "Custom3Rotation", "Custom3Toggle", "Custom3Flip", &g_Config.CustomKey3, {0, 3, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom4Mapping", "Custom4Image", "Custom4Shape", "Custom4Rotation", "Custom4Toggle", "Custom4Flip", &g_Config.CustomKey4, {0, 4, 0, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom5Mapping", "Custom5Image", "Custom5Shape", "Custom5Rotation", "Custom5Toggle", "Custom5Flip", &g_Config.CustomKey5, {0, 0, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom6Mapping", "Custom6Image", "Custom6Shape", "Custom6Rotation", "Custom6Toggle", "Custom6Flip", &g_Config.CustomKey6, {0, 1, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom7Mapping", "Custom7Image", "Custom7Shape", "Custom7Rotation", "Custom7Toggle", "Custom7Flip", &g_Config.CustomKey7, {0, 2, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom8Mapping", "Custom8Image", "Custom8Shape", "Custom8Rotation", "Custom8Toggle", "Custom8Flip", &g_Config.CustomKey8, {0, 3, 1, 0.0f, false, false}, true, true),
+	ConfigSetting("Custom9Mapping", "Custom9Image", "Custom9Shape", "Custom9Rotation", "Custom9Toggle", "Custom9Flip", &g_Config.CustomKey9, {0, 4, 1, 0.0f, false, false}, true, true),
 
 #if defined(_WIN32)
 	// A win32 user seeing touch controls is likely using PPSSPP on a tablet. There it makes
@@ -965,7 +989,6 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("DPadSpacing", &g_Config.fDpadSpacing, 1.0f, true, true),
 	ConfigSetting("StartKeyX", "StartKeyY", "StartKeyScale", "ShowTouchStart", &g_Config.touchStartKey, defaultTouchPosShow, true, true),
 	ConfigSetting("SelectKeyX", "SelectKeyY", "SelectKeyScale", "ShowTouchSelect", &g_Config.touchSelectKey, defaultTouchPosShow, true, true),
-	ConfigSetting("UnthrottleKeyX", "UnthrottleKeyY", "UnthrottleKeyScale", "ShowTouchUnthrottle", &g_Config.touchUnthrottleKey, defaultTouchPosShow, true, true),
 	ConfigSetting("LKeyX", "LKeyY", "LKeyScale", "ShowTouchLTrigger", &g_Config.touchLKey, defaultTouchPosShow, true, true),
 	ConfigSetting("RKeyX", "RKeyY", "RKeyScale", "ShowTouchRTrigger", &g_Config.touchRKey, defaultTouchPosShow, true, true),
 	ConfigSetting("AnalogStickX", "AnalogStickY", "AnalogStickScale", "ShowAnalogStick", &g_Config.touchAnalogStick, defaultTouchPosShow, true, true),
@@ -981,12 +1004,6 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("fcombo7X", "fcombo7Y", "comboKeyScale7", "ShowComboKey7", &g_Config.touchCombo7, defaultTouchPosHide, true, true),
 	ConfigSetting("fcombo8X", "fcombo8Y", "comboKeyScale8", "ShowComboKey8", &g_Config.touchCombo8, defaultTouchPosHide, true, true),
 	ConfigSetting("fcombo9X", "fcombo9Y", "comboKeyScale9", "ShowComboKey9", &g_Config.touchCombo9, defaultTouchPosHide, true, true),
-
-	ConfigSetting("Speed1KeyX", "Speed1KeyY", "Speed1KeyScale", "ShowSpeed1Key", &g_Config.touchSpeed1Key, defaultTouchPosHide, true, true),
-	ConfigSetting("Speed2KeyX", "Speed2KeyY", "Speed2KeyScale", "ShowSpeed2Key", &g_Config.touchSpeed2Key, defaultTouchPosHide, true, true),
-	ConfigSetting("RapidFireKeyX", "RapidFireKeyY", "RapidFireKeyScale", "ShowRapidFireKey", &g_Config.touchRapidFireKey, defaultTouchPosHide, true, true),
-	ConfigSetting("AnalogRotationCWKeyX", "AnalogRotationKeyCWY", "AnalogRotationKeyCWScale", "ShowAnalogRotationCWKey", &g_Config.touchAnalogRotationCWKey, defaultTouchPosHide, true, true),
-	ConfigSetting("AnalogRotationCCWKeyX", "AnalogRotationKeyCCWY", "AnalogRotationKeyCCWScale", "ShowAnalogRotationCCWKey", &g_Config.touchAnalogRotationCCWKey, defaultTouchPosHide, true, true),
 
 #ifdef _WIN32
 	ConfigSetting("DInputAnalogDeadzone", &g_Config.fDInputAnalogDeadzone, 0.1f, true, true),
@@ -1813,7 +1830,6 @@ void Config::ResetControlLayout() {
 	g_Config.fDpadSpacing = 1.0f;
 	reset(g_Config.touchStartKey);
 	reset(g_Config.touchSelectKey);
-	reset(g_Config.touchUnthrottleKey);
 	reset(g_Config.touchLKey);
 	reset(g_Config.touchRKey);
 	reset(g_Config.touchAnalogStick);
@@ -1828,11 +1844,6 @@ void Config::ResetControlLayout() {
 	reset(g_Config.touchCombo7);
 	reset(g_Config.touchCombo8);
 	reset(g_Config.touchCombo9);
-	reset(g_Config.touchSpeed1Key);
-	reset(g_Config.touchSpeed2Key);
-	reset(g_Config.touchRapidFireKey);
-	reset(g_Config.touchAnalogRotationCWKey);
-	reset(g_Config.touchAnalogRotationCCWKey);
 }
 
 void Config::GetReportingInfo(UrlEncoder &data) {

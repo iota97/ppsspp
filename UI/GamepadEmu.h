@@ -85,40 +85,6 @@ private:
 	bool *value_;
 };
 
-class FPSLimitButton : public MultiTouchButton {
-public:
-	FPSLimitButton(FPSLimit limit, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
-		: MultiTouchButton(bgImg, bgDownImg, img, scale, layoutParams), limit_(limit) {
-
-	}
-	void Touch(const TouchInput &input) override;
-	bool IsDown() override;
-
-private:
-	FPSLimit limit_;
-};
-
-class RapidFireButton : public MultiTouchButton {
-public:
-	RapidFireButton(ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
-		: MultiTouchButton(bgImg, bgDownImg, img, scale, layoutParams) {
-	}
-	void Touch(const TouchInput &input) override;
-	bool IsDown() override;
-};
-
-class AnalogRotationButton : public MultiTouchButton {
-public:
-	AnalogRotationButton(bool clockWise, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
-		: MultiTouchButton(bgImg, bgDownImg, img, scale, layoutParams), clockWise_(clockWise) {
-	}
-	void Touch(const TouchInput &input) override;
-	void Update() override;
-
-private:
-	bool autoRotating_ = false;
-	bool clockWise_;
-};
 
 class PSPButton : public MultiTouchButton {
 public:
