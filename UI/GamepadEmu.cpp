@@ -978,7 +978,7 @@ void GestureGamepad::Touch(const TouchInput &input) {
 			lastX_ = input.x;
 			lastY_ = input.y;
 
-			const float now = time_now();
+			const float now = time_now_d();
 			if (now - lastTapRelease_ < 0.3f && !haveDoubleTapped_) {
 				if (g_Config.iDoubleTapGesture != 0 )
 					__CtrlButtonDown(button[g_Config.iDoubleTapGesture-1]);
@@ -999,8 +999,8 @@ void GestureGamepad::Touch(const TouchInput &input) {
 	if (input.flags & TOUCH_UP) {
 		if (input.id == dragPointerId_) {
 			dragPointerId_ = -1;
-			if (time_now() - lastTouchDown_ < 0.3f)
-				lastTapRelease_ = time_now();
+			if (time_now_d() - lastTouchDown_ < 0.3f)
+				lastTapRelease_ = time_now_d();
 
 			if (haveDoubleTapped_) {
 				if (g_Config.iDoubleTapGesture != 0)
