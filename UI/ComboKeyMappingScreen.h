@@ -33,8 +33,7 @@ public:
 	void onFinish(DialogResult result) override;
 	UI::EventReturn onCombo(UI::EventParams &e);
 private:
-	std::map<std::string, bool*> keyToggles;
-	bool array[16];
+	bool array[29];
 	int *mode;
 	UI::ChoiceStrip *comboselect;
 	UI::ScrollView *rightScroll_;

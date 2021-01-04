@@ -72,27 +72,27 @@ void ComboKeyScreen::CreateViews() {
 	switch (*mode) {
 	case 0: 
 		toggle = &g_Config.bComboToggle0;
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey0 >> i) & 0x01));
 		break;
 	case 1:
 		toggle = &g_Config.bComboToggle1;
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey1 >> i) & 0x01));
 		break;
 	case 2:
 		toggle = &g_Config.bComboToggle2;
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey2 >> i) & 0x01));
 		break;
 	case 3:
 		toggle = &g_Config.bComboToggle3;
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey3 >> i) & 0x01));
 		break;
 	case 4:
 		toggle = &g_Config.bComboToggle4;
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.iCombokey4 >> i) & 0x01));
 		break;
 	default:
@@ -110,37 +110,56 @@ void ComboKeyScreen::CreateViews() {
 	keyImages["R"] = ImageID("I_R");
 	keyImages["Start"] = ImageID("I_START");
 	keyImages["Select"] = ImageID("I_SELECT");
-	keyToggles["Circle"] = &array[13];
-	keyToggles["Cross"] = &array[14];
-	keyToggles["Square"] = &array[15];
-	keyToggles["Triangle"] = &array[12];
-	keyToggles["L"] = &array[8];
-	keyToggles["R"] = &array[9];
-	keyToggles["Left"] = &array[7];
-	keyToggles["Up"] = &array[4];
-	keyToggles["Right"] = &array[5];
-	keyToggles["Down"] = &array[6];
-	keyToggles["Start"] = &array[3];
-	keyToggles["Select"] = &array[0];
+
+	std::vector<std::string> keyToggles;
+	keyToggles.push_back("Square");
+	keyToggles.push_back("Triangle");
+	keyToggles.push_back("Circle");
+	keyToggles.push_back("Cross");
+	keyToggles.push_back("Up");
+	keyToggles.push_back("Down");
+	keyToggles.push_back("Left");
+	keyToggles.push_back("Right");
+	keyToggles.push_back("Start");
+	keyToggles.push_back("Select");
+	keyToggles.push_back("L");
+	keyToggles.push_back("R");
+	keyToggles.push_back("Rapid Fire");
+	keyToggles.push_back("Unthrottle");
+	keyToggles.push_back("Speed Toggle");
+	keyToggles.push_back("Rewind");
+	keyToggles.push_back("Save State");
+	keyToggles.push_back("Load State");
+	keyToggles.push_back("Next Slot");
+	keyToggles.push_back("Toggle Fullscreen");
+	keyToggles.push_back("Speed Custom 1");
+	keyToggles.push_back("Speed Custom 2");
+	keyToggles.push_back("Texture Dump");
+	keyToggles.push_back("Texture Replace");
+	keyToggles.push_back("Screenshot");
+	keyToggles.push_back("Toggle Mute");
+	keyToggles.push_back("Open Chat");
+	keyToggles.push_back("Analog CW");
+	keyToggles.push_back("Analog CCW");
 
 	std::map<std::string, ImageID>::iterator imageFinder;
 
 	auto mc = GetI18NCategory("MappableControls");
 
-	for (auto i = keyToggles.begin(); i != keyToggles.end(); ++i) {
+	for (int i = 0; i < keyToggles.size(); ++i) {
 		LinearLayout *row = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(FILL_PARENT, WRAP_CONTENT));
 		row->SetSpacing(0);
 
-		CheckBox *checkbox = new CheckBox(i->second, "", "", new LinearLayoutParams(50, WRAP_CONTENT));
+		CheckBox *checkbox = new CheckBox(&array[i], "", "", new LinearLayoutParams(50, WRAP_CONTENT));
 		row->Add(checkbox);
 
-		imageFinder = keyImages.find(i->first);
+		imageFinder = keyImages.find(keyToggles[i]);
 		Choice *choice;
 		if (imageFinder != keyImages.end()) {
 			choice = new Choice(keyImages[imageFinder->first], new LinearLayoutParams(1.0f));
 		}
 		else {
-			choice = new Choice(mc->T(i->first.c_str()), new LinearLayoutParams(1.0f));
+			choice = new Choice(mc->T(keyToggles[i].c_str()), new LinearLayoutParams(1.0f));
 		}
 
 		ChoiceEventHandler *choiceEventHandler = new ChoiceEventHandler(checkbox);
@@ -168,9 +187,9 @@ void ComboKeyScreen::CreateViews() {
 	grid->Add(row);
 }
 
-static int arrayToInt(bool ary[16]) {
+static int arrayToInt(bool ary[29]) {
 	int value = 0;
-	for (int i = 15; i >= 0; i--) {
+	for (int i = 28; i >= 0; i--) {
 		value |= ary[i] ? 1 : 0;
 		value = value << 1;
 	}
@@ -200,8 +219,6 @@ void ComboKeyScreen::onFinish(DialogResult result) {
 
 UI::EventReturn ComboKeyScreen::ChoiceEventHandler::onChoiceClick(UI::EventParams &e){
 	checkbox_->Toggle();
-
-
 	return UI::EVENT_DONE;
 };
 
@@ -221,5 +238,3 @@ UI::EventReturn ComboKeyScreen::onCombo(UI::EventParams &e) {
 	CreateViews();
 	return UI::EVENT_DONE;
 }
-
-

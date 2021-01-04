@@ -30,6 +30,7 @@
 #include "Core/Core.h"
 #include "Core/System.h"
 #include "Core/HLE/sceCtrl.h"
+#include "Core/KeyMap.h"
 #include "UI/GamepadEmu.h"
 
 static u32 GetButtonColor() {
@@ -232,26 +233,63 @@ void ComboKey::Touch(const TouchInput &input) {
 	bool lastDown = pointerDownMask_ != 0;
 	MultiTouchButton::Touch(input);
 	bool down = pointerDownMask_ != 0;
-	static const int combo[16] = {CTRL_SQUARE ,CTRL_TRIANGLE ,CTRL_CIRCLE ,CTRL_CROSS ,CTRL_UP ,CTRL_DOWN ,CTRL_LEFT ,CTRL_RIGHT ,CTRL_START ,CTRL_SELECT ,CTRL_LTRIGGER ,CTRL_RTRIGGER };
+
+	static const uint32_t keyList[] = {
+		// PSP controls
+		CTRL_SQUARE,
+		CTRL_TRIANGLE,
+		CTRL_CIRCLE,
+		CTRL_CROSS,
+		CTRL_UP,
+		CTRL_DOWN,
+		CTRL_LEFT,
+		CTRL_RIGHT,
+		CTRL_START,
+		CTRL_SELECT,
+		CTRL_LTRIGGER,
+		CTRL_RTRIGGER,
+
+		// Virtual key
+		VIRTKEY_RAPID_FIRE,
+		VIRTKEY_UNTHROTTLE,
+		VIRTKEY_SPEED_TOGGLE,
+		VIRTKEY_REWIND,
+		VIRTKEY_SAVE_STATE,
+		VIRTKEY_LOAD_STATE,
+		VIRTKEY_NEXT_SLOT,
+		VIRTKEY_TOGGLE_FULLSCREEN,
+		VIRTKEY_SPEED_CUSTOM1,
+		VIRTKEY_SPEED_CUSTOM2,
+		VIRTKEY_TEXTURE_DUMP,
+		VIRTKEY_TEXTURE_REPLACE,
+		VIRTKEY_SCREENSHOT,
+		VIRTKEY_MUTE_TOGGLE,
+		VIRTKEY_OPENCHAT,
+		VIRTKEY_ANALOG_ROTATE_CW,
+		VIRTKEY_ANALOG_ROTATE_CCW
+	};
+
 	if (down || lastDown) {
-		for (int i = 0; i < 16; i++) {
-			if (pspButtonBit_ & combo[i])
-			{
+		for (int i = 0; i < sizeof(keyList)/sizeof(keyList[0]); i++) {
+			if (pspButtonBit_ & (1 << i)) {
 				if (down && !lastDown) {
 					if (g_Config.bHapticFeedback) {
 						Vibrate(HAPTIC_VIRTUAL_KEY);
 					}
 					if (!toggle_) {
-						__CtrlButtonDown(combo[i]);
+						emuScreen_->pspKey(keyList[i], KEY_DOWN);
 					} else {
-						if (__CtrlPeekButtons() & combo[i])
-							__CtrlButtonUp(combo[i]);
-						else
-							__CtrlButtonDown(combo[i]);
+						if (on_) {
+							emuScreen_->pspKey(keyList[i], KEY_UP);
+							on_ = false;
+						} else {
+							emuScreen_->pspKey(keyList[i], KEY_DOWN);
+							on_ = true;
+						}
 					}
 				}
 				else if (lastDown && !down && !toggle_) {
-					__CtrlButtonUp(combo[i]);
+					emuScreen_->pspKey(keyList[i], KEY_UP);
 				}
 			}
 		}
@@ -737,7 +775,7 @@ void InitPadLayout(float xres, float yres, float globalScale) {
 	initTouchPos(g_Config.touchCombo4, combo4_key_X, combo4_key_Y);
 }
 
-UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause) {
+UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* emuScreen) {
 	using namespace UI;
 
 	AnchorLayout *root = new AnchorLayout(new LayoutParams(FILL_PARENT, FILL_PARENT));
@@ -780,7 +818,7 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause) {
 	};
 	auto addComboKey = [=](int buttonBit, bool toggle, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch) -> ComboKey * {
 		if (touch.show) {
-			return root->Add(new ComboKey(buttonBit, toggle, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch)));
+			return root->Add(new ComboKey(buttonBit, toggle, emuScreen, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch)));
 		}
 		return nullptr;
 	};

@@ -23,6 +23,7 @@
 #include "Common/UI/View.h"
 #include "Common/UI/ViewGroup.h"
 #include "Core/CoreParameter.h"
+#include "UI/EmuScreen.h"
 
 class GamepadView : public UI::View {
 public:
@@ -194,18 +195,21 @@ private:
 //initializes the layout from Config. if a default layout does not exist,
 //it sets up default values
 void InitPadLayout(float xres, float yres, float globalScale = 1.15f);
-UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause);
+UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* emuScreen);
 
 const int D_pad_Radius = 50;
 const int baseActionButtonSpacing = 60;
 
 class ComboKey : public MultiTouchButton {
 public:
-	ComboKey(int pspButtonBit, bool toggle, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
-		: MultiTouchButton(bgImg, bgDownImg, img, scale, layoutParams), pspButtonBit_(pspButtonBit), toggle_(toggle) {
+	ComboKey(int pspButtonBit, bool toggle, EmuScreen* emuScreen, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
+		: MultiTouchButton(bgImg, bgDownImg, img, scale, layoutParams), pspButtonBit_(pspButtonBit), toggle_(toggle), emuScreen_(emuScreen), on_(false) {
 	}
 	void Touch(const TouchInput &input) override;
 private:
 	int pspButtonBit_;
 	bool toggle_;
+	int keyId_;
+	EmuScreen* emuScreen_;
+	bool on_;
 };
