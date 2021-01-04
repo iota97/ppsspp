@@ -50,64 +50,50 @@ void ComboKeyScreen::CreateViews() {
 		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
 	};
 
-	bool *toggle = nullptr;
-	int *image = nullptr;
-	int *shape = nullptr;
-	bool *show = nullptr;
+	ConfigCustomButton* cfg = nullptr;
+	bool* show = nullptr;
 	memset(array, 0, sizeof(array));
 	switch (id_) {
 	case 0: 
-		toggle = &g_Config.bComboToggle0;
-		image = &g_Config.iCombokeyImage0;
-		shape = &g_Config.iComboShape0;
+		cfg = &g_Config.CustomKey0;
 		show = &g_Config.touchCombo0.show;
 		for (int i = 0; i < 29; i++)
-			array[i] = (0x01 == ((g_Config.iCombokey0 >> i) & 0x01));
+			array[i] = (0x01 == ((g_Config.CustomKey0.key >> i) & 0x01));
 		break;
 	case 1:
-		toggle = &g_Config.bComboToggle1;
-		image = &g_Config.iCombokeyImage1;
-		shape = &g_Config.iComboShape1;
+		cfg = &g_Config.CustomKey1;
 		show = &g_Config.touchCombo1.show;
 		for (int i = 0; i < 29; i++)
-			array[i] = (0x01 == ((g_Config.iCombokey1 >> i) & 0x01));
+			array[i] = (0x01 == ((g_Config.CustomKey1.key >> i) & 0x01));
 		break;
 	case 2:
-		toggle = &g_Config.bComboToggle2;
-		image = &g_Config.iCombokeyImage2;
-		shape = &g_Config.iComboShape2;
+		cfg = &g_Config.CustomKey2;
 		show = &g_Config.touchCombo2.show;
 		for (int i = 0; i < 29; i++)
-			array[i] = (0x01 == ((g_Config.iCombokey2 >> i) & 0x01));
+			array[i] = (0x01 == ((g_Config.CustomKey2.key >> i) & 0x01));
 		break;
 	case 3:
-		toggle = &g_Config.bComboToggle3;
-		image = &g_Config.iCombokeyImage3;
-		shape = &g_Config.iComboShape3;
+		cfg = &g_Config.CustomKey3;
 		show = &g_Config.touchCombo3.show;
 		for (int i = 0; i < 29; i++)
-			array[i] = (0x01 == ((g_Config.iCombokey3 >> i) & 0x01));
+			array[i] = (0x01 == ((g_Config.CustomKey3.key >> i) & 0x01));
 		break;
 	case 4:
-		toggle = &g_Config.bComboToggle4;
-		image = &g_Config.iCombokeyImage4;
-		shape = &g_Config.iComboShape4;
+		cfg = &g_Config.CustomKey4;
 		show = &g_Config.touchCombo4.show;
 		for (int i = 0; i < 29; i++)
-			array[i] = (0x01 == ((g_Config.iCombokey4 >> i) & 0x01));
+			array[i] = (0x01 == ((g_Config.CustomKey4.key >> i) & 0x01));
 		break;
 	default:
 		// This shouldn't happen, let's just not crash.
-		toggle = &g_Config.bComboToggle0;
-		image = &g_Config.iCombokeyImage0;
-		shape = &g_Config.iComboShape0;
+		cfg = &g_Config.CustomKey0;
 		show = &g_Config.touchCombo0.show;
 		break;
 	}
 
 	ImageID rectImage = g_Config.iTouchButtonStyle ? ImageID("I_RECT_LINE") : ImageID("I_RECT");
 	ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
-	leftColumn->Add(new Choice(comboKeyImages[*image], *shape ? rectImage : roundImage));
+	leftColumn->Add(new Choice(comboKeyImages[cfg->image], cfg->shape ? rectImage : roundImage));
 	root__->Add(leftColumn);
 	rightScroll_ = new ScrollView(ORIENT_VERTICAL, new LinearLayoutParams(WRAP_CONTENT, WRAP_CONTENT, 1.0f));
 	leftColumn->Add(new Spacer(new LinearLayoutParams(1.0f)));
@@ -122,11 +108,11 @@ void ComboKeyScreen::CreateViews() {
 	
 	vertLayout->Add(new CheckBox(show, co->T("Visible")));
 	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow" };
-	PopupMultiChoice *icon = vertLayout->Add(new PopupMultiChoice(image, co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
+	PopupMultiChoice *icon = vertLayout->Add(new PopupMultiChoice(&(cfg->image), co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
 	icon->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
 	static const char *shapeNames[] = { "Circle", "Rectangle" };
-	vertLayout->Add(new PopupMultiChoice(shape, co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()))->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
-	vertLayout->Add(new CheckBox(toggle, co->T("Toggle mode")));
+	vertLayout->Add(new PopupMultiChoice(&(cfg->shape), co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()))->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
+	vertLayout->Add(new CheckBox(&(cfg->toggle), co->T("Toggle mode")));
 
 	GridLayout *grid = vertLayout->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
 
@@ -211,19 +197,19 @@ static int arrayToInt(bool ary[29]) {
 void ComboKeyScreen::onFinish(DialogResult result) {
 	switch (id_) {
 	case 0:
-		g_Config.iCombokey0 = arrayToInt(array);
+		g_Config.CustomKey0.key = arrayToInt(array);
 		break;
 	case 1:
-		g_Config.iCombokey1 = arrayToInt(array);
+		g_Config.CustomKey1.key = arrayToInt(array);
 		break;
 	case 2:
-		g_Config.iCombokey2 = arrayToInt(array);
+		g_Config.CustomKey2.key = arrayToInt(array);
 		break;
 	case 3:
-		g_Config.iCombokey3 = arrayToInt(array);
+		g_Config.CustomKey3.key = arrayToInt(array);
 		break;
 	case 4:
-		g_Config.iCombokey4 = arrayToInt(array);
+		g_Config.CustomKey4.key = arrayToInt(array);
 		break;
 	}
 	g_Config.Save("ComboKeyScreen::onFinish");
@@ -235,16 +221,22 @@ UI::EventReturn ComboKeyScreen::ChoiceEventHandler::onChoiceClick(UI::EventParam
 };
 
 UI::EventReturn ComboKeyScreen::onCombo(UI::EventParams &e) {
-	switch (id_){
-	case 0:g_Config.iCombokey0 = arrayToInt(array);
+	switch (id_) {
+	case 0:
+		g_Config.CustomKey0.key = arrayToInt(array);
 		break;
-	case 1:g_Config.iCombokey1 = arrayToInt(array);
+	case 1:
+		g_Config.CustomKey1.key = arrayToInt(array);
 		break;
-	case 2:g_Config.iCombokey2 = arrayToInt(array);
+	case 2:
+		g_Config.CustomKey2.key = arrayToInt(array);
 		break;
-	case 3:g_Config.iCombokey3 = arrayToInt(array);
+	case 3:
+		g_Config.CustomKey3.key = arrayToInt(array);
 		break;
-	case 4:g_Config.iCombokey4 = arrayToInt(array);
+	case 4:
+		g_Config.CustomKey4.key = arrayToInt(array);
+		break;
 	}
 	CreateViews();
 	return UI::EVENT_DONE;

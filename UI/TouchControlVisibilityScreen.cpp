@@ -93,23 +93,23 @@ void TouchControlVisibilityScreen::CreateViews() {
 		return UI::EVENT_DONE;
 	}});
 	toggles_.push_back({ "Unthrottle", &g_Config.touchUnthrottleKey.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "Custom 1", &g_Config.touchCombo0.show, comboKeyImages[g_Config.iCombokeyImage0], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 1", &g_Config.touchCombo0.show, comboKeyImages[g_Config.CustomKey0.image], [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(0));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 2", &g_Config.touchCombo1.show, comboKeyImages[g_Config.iCombokeyImage1], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 2", &g_Config.touchCombo1.show, comboKeyImages[g_Config.CustomKey1.image], [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(1));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 3", &g_Config.touchCombo2.show, comboKeyImages[g_Config.iCombokeyImage2], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 3", &g_Config.touchCombo2.show, comboKeyImages[g_Config.CustomKey2.image], [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(2));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 4", &g_Config.touchCombo3.show, comboKeyImages[g_Config.iCombokeyImage3], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 4", &g_Config.touchCombo3.show, comboKeyImages[g_Config.CustomKey3.image], [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(3));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 5", &g_Config.touchCombo4.show, comboKeyImages[g_Config.iCombokeyImage4], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 5", &g_Config.touchCombo4.show, comboKeyImages[g_Config.CustomKey4.image], [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(4));
 		return UI::EVENT_DONE;
 	}});

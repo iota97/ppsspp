@@ -71,6 +71,7 @@ struct ConfigSetting {
 		TYPE_FLOAT,
 		TYPE_STRING,
 		TYPE_TOUCH_POS,
+		TYPE_CUSTOM_BUTTON,
 	};
 	union Value {
 		bool b;
@@ -79,6 +80,7 @@ struct ConfigSetting {
 		float f;
 		const char *s;
 		ConfigTouchPos touchPos;
+		ConfigCustomButton customButton;
 	};
 	union SettingPtr {
 		bool *b;
@@ -87,6 +89,7 @@ struct ConfigSetting {
 		float *f;
 		std::string *s;
 		ConfigTouchPos *touchPos;
+		ConfigCustomButton *customButton;
 	};
 
 	typedef bool (*BoolDefaultCallback)();
@@ -95,6 +98,7 @@ struct ConfigSetting {
 	typedef float (*FloatDefaultCallback)();
 	typedef const char *(*StringDefaultCallback)();
 	typedef ConfigTouchPos (*TouchPosDefaultCallback)();
+	typedef ConfigCustomButton (*CustomButtonDefaultCallback)();
 
 	union Callback {
 		BoolDefaultCallback b;
@@ -103,6 +107,7 @@ struct ConfigSetting {
 		FloatDefaultCallback f;
 		StringDefaultCallback s;
 		TouchPosDefaultCallback touchPos;
+		CustomButtonDefaultCallback customButton;
 	};
 
 	ConfigSetting(bool v)
@@ -158,6 +163,13 @@ struct ConfigSetting {
 		ptr_.touchPos = v;
 		cb_.touchPos = nullptr;
 		default_.touchPos = def;
+	}
+
+	ConfigSetting(const char *iniKey, const char *iniImage, const char *iniShape, const char *iniToggle, ConfigCustomButton *v, ConfigCustomButton def, bool save = true, bool perGame = false)
+		: ini_(iniKey), ini2_(iniImage), ini3_(iniShape), ini4_(iniToggle), type_(TYPE_CUSTOM_BUTTON), report_(false), save_(save), perGame_(perGame) {
+		ptr_.customButton = v;
+		cb_.customButton = nullptr;
+		default_.customButton = def;
 	}
 
 	ConfigSetting(const char *ini, bool *v, BoolDefaultCallback def, bool save = true, bool perGame = false)
@@ -253,6 +265,15 @@ struct ConfigSetting {
 				ptr_.touchPos->show = default_.touchPos.show;
 			}
 			return true;
+		case TYPE_CUSTOM_BUTTON:
+			if (cb_.customButton) {
+				default_.customButton = cb_.customButton();
+			}
+			section->Get(ini_, &ptr_.customButton->key, default_.customButton.key);
+			section->Get(ini2_, &ptr_.customButton->image, default_.customButton.image);
+			section->Get(ini3_, &ptr_.customButton->shape, default_.customButton.shape);
+			section->Get(ini4_, &ptr_.customButton->toggle, default_.customButton.toggle);
+			return true;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
 			return false;
@@ -286,6 +307,12 @@ struct ConfigSetting {
 				section->Set(ini4_, ptr_.touchPos->show);
 			}
 			return;
+		case TYPE_CUSTOM_BUTTON:
+			section->Set(ini_, ptr_.customButton->key);
+			section->Set(ini2_, ptr_.customButton->image);
+			section->Set(ini3_, ptr_.customButton->shape);
+			section->Set(ini4_, ptr_.customButton->toggle);
+			return;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
 			return;
@@ -308,6 +335,9 @@ struct ConfigSetting {
 		case TYPE_STRING:
 			return data.Add(prefix + ini_, *ptr_.s);
 		case TYPE_TOUCH_POS:
+			// Doesn't report.
+			return;
+		case TYPE_CUSTOM_BUTTON:
 			// Doesn't report.
 			return;
 		default:
@@ -866,29 +896,11 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("ShowTouchSquare", &g_Config.bShowTouchSquare, true, true, true),
 	ConfigSetting("ShowTouchTriangle", &g_Config.bShowTouchTriangle, true, true, true),
 
-	ConfigSetting("ComboKey0Mapping", &g_Config.iCombokey0, 0, true, true),
-	ConfigSetting("ComboKey1Mapping", &g_Config.iCombokey1, 0, true, true),
-	ConfigSetting("ComboKey2Mapping", &g_Config.iCombokey2, 0, true, true),
-	ConfigSetting("ComboKey3Mapping", &g_Config.iCombokey3, 0, true, true),
-	ConfigSetting("ComboKey4Mapping", &g_Config.iCombokey4, 0, true, true),
-
-	ConfigSetting("ComboKey0Toggle", &g_Config.bComboToggle0, false, true, true),
-	ConfigSetting("ComboKey1Toggle", &g_Config.bComboToggle1, false, true, true),
-	ConfigSetting("ComboKey2Toggle", &g_Config.bComboToggle2, false, true, true),
-	ConfigSetting("ComboKey3Toggle", &g_Config.bComboToggle3, false, true, true),
-	ConfigSetting("ComboKey4Toggle", &g_Config.bComboToggle4, false, true, true),
-
-	ConfigSetting("ComboKey0Image", &g_Config.iCombokeyImage0, 0, true, true),
-	ConfigSetting("ComboKey1Image", &g_Config.iCombokeyImage1, 1, true, true),
-	ConfigSetting("ComboKey2Image", &g_Config.iCombokeyImage2, 2, true, true),
-	ConfigSetting("ComboKey3Image", &g_Config.iCombokeyImage3, 3, true, true),
-	ConfigSetting("ComboKey4Image", &g_Config.iCombokeyImage4, 4, true, true),
-
-	ConfigSetting("ComboKey0Shape", &g_Config.iComboShape0, 0, true, true),
-	ConfigSetting("ComboKey1Shape", &g_Config.iComboShape1, 0, true, true),
-	ConfigSetting("ComboKey2Shape", &g_Config.iComboShape2, 0, true, true),
-	ConfigSetting("ComboKey3Shape", &g_Config.iComboShape3, 0, true, true),
-	ConfigSetting("ComboKey4Shape", &g_Config.iComboShape4, 0, true, true),
+	ConfigSetting("Custom0Mapping", "Custom0Image", "Custom0Shape", "Custom0Toggle", &g_Config.CustomKey0, {0, 0, 0, false}, true, true),
+	ConfigSetting("Custom1Mapping", "Custom1Image", "Custom1Shape", "Custom1Toggle", &g_Config.CustomKey1, {0, 1, 0, false}, true, true),
+	ConfigSetting("Custom2Mapping", "Custom2Image", "Custom2Shape", "Custom2Toggle", &g_Config.CustomKey2, {0, 2, 0, false}, true, true),
+	ConfigSetting("Custom3Mapping", "Custom3Image", "Custom3Shape", "Custom3Toggle", &g_Config.CustomKey3, {0, 3, 0, false}, true, true),
+	ConfigSetting("Custom4Mapping", "Custom4Image", "Custom4Shape", "Custom4Toggle", &g_Config.CustomKey4, {0, 4, 0, false}, true, true),
 
 #if defined(_WIN32)
 	// A win32 user seeing touch controls is likely using PPSSPP on a tablet. There it makes

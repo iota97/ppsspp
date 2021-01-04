@@ -53,6 +53,13 @@ struct ConfigTouchPos {
 	bool show;
 };
 
+struct ConfigCustomButton {
+	int key;
+	int image;
+	int shape;
+	bool toggle;
+};
+
 struct Config {
 public:
 	Config();
@@ -362,30 +369,11 @@ public:
 	bool bShowTouchTriangle;
 	bool bShowTouchSquare;
 
-	// Combo_key mapping. These are bitfields.
-	int iCombokey0;
-	int iCombokey1;
-	int iCombokey2;
-	int iCombokey3;
-	int iCombokey4;
-
-	bool bComboToggle0;
-	bool bComboToggle1;
-	bool bComboToggle2;
-	bool bComboToggle3;
-	bool bComboToggle4;
-
-	int iCombokeyImage0;
-	int iCombokeyImage1;
-	int iCombokeyImage2;
-	int iCombokeyImage3;
-	int iCombokeyImage4;
-
-	int iComboShape0;
-	int iComboShape1;
-	int iComboShape2;
-	int iComboShape3;
-	int iComboShape4;	
+	ConfigCustomButton CustomKey0;
+	ConfigCustomButton CustomKey1;
+	ConfigCustomButton CustomKey2;
+	ConfigCustomButton CustomKey3;
+	ConfigCustomButton CustomKey4;	
 
 	// Ignored on iOS and other platforms that lack pause.
 	bool bShowTouchPause;

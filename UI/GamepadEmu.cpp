@@ -229,6 +229,10 @@ void PSPButton::Touch(const TouchInput &input) {
 	}
 }
 
+bool ComboKey::IsDown() {
+	return (toggle_ && on_) || (!toggle_ && pointerDownMask_ != 0);
+}
+
 void ComboKey::Touch(const TouchInput &input) {
 	bool lastDown = pointerDownMask_ != 0;
 	MultiTouchButton::Touch(input);
@@ -812,9 +816,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 		}
 		return nullptr;
 	};
-	auto addComboKey = [=](int buttonBit, bool toggle, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch) -> ComboKey * {
+	auto addComboKey = [=](const ConfigCustomButton& cfg, const ConfigTouchPos &touch) -> ComboKey * {
 		if (touch.show) {
-			return root->Add(new ComboKey(buttonBit, toggle, emuScreen, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch)));
+			return root->Add(new ComboKey(cfg.key, cfg.toggle, emuScreen, 
+					cfg.shape ? rectImage : roundImage, cfg.shape ? ImageID("I_RECT") : ImageID("I_ROUND"), 
+					comboKeyImages[cfg.image], touch.scale, buttonLayoutParams(touch)));
 		}
 		return nullptr;
 	};
@@ -899,11 +905,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 			root->Add(new PSPStick(stickBg, stickImage, ImageID("I_STICK"), 1, g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
 	}
 
-	addComboKey(g_Config.iCombokey0, g_Config.bComboToggle0, g_Config.iComboShape0 ? rectImage : roundImage, g_Config.iComboShape0 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage0], g_Config.touchCombo0);
-	addComboKey(g_Config.iCombokey1, g_Config.bComboToggle1, g_Config.iComboShape1 ? rectImage : roundImage, g_Config.iComboShape1 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage1], g_Config.touchCombo1);
-	addComboKey(g_Config.iCombokey2, g_Config.bComboToggle2, g_Config.iComboShape2 ? rectImage : roundImage, g_Config.iComboShape2 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage2], g_Config.touchCombo2);
-	addComboKey(g_Config.iCombokey3, g_Config.bComboToggle3, g_Config.iComboShape3 ? rectImage : roundImage, g_Config.iComboShape3 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage3], g_Config.touchCombo3);
-	addComboKey(g_Config.iCombokey4, g_Config.bComboToggle4, g_Config.iComboShape4 ? rectImage : roundImage, g_Config.iComboShape4 ? ImageID("I_RECT") : ImageID("I_ROUND"), comboKeyImages[g_Config.iCombokeyImage4], g_Config.touchCombo4);
-
+	addComboKey(g_Config.CustomKey0, g_Config.touchCombo0);
+	addComboKey(g_Config.CustomKey1, g_Config.touchCombo1);
+	addComboKey(g_Config.CustomKey2, g_Config.touchCombo2);
+	addComboKey(g_Config.CustomKey3, g_Config.touchCombo3);
+	addComboKey(g_Config.CustomKey4, g_Config.touchCombo4);
+	
 	return root;
 }

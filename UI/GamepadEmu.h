@@ -206,6 +206,7 @@ public:
 		: MultiTouchButton(bgImg, bgDownImg, img, scale, layoutParams), pspButtonBit_(pspButtonBit), toggle_(toggle), emuScreen_(emuScreen), on_(false) {
 	}
 	void Touch(const TouchInput &input) override;
+	bool IsDown() override;
 private:
 	int pspButtonBit_;
 	bool toggle_;
