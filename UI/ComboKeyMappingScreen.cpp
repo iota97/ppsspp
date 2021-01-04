@@ -170,6 +170,7 @@ void ComboKeyScreen::CreateViews() {
 	LinearLayout *vertLayout = new LinearLayout(ORIENT_VERTICAL);
 	rightScroll_->Add(vertLayout);
 	
+	vertLayout->Add(new ItemHeader(co->T("Button Style")));
 	vertLayout->Add(new CheckBox(show, co->T("Visible")));
 
 	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow" };
@@ -183,8 +184,8 @@ void ComboKeyScreen::CreateViews() {
 
 	vertLayout->Add(new CheckBox(&(cfg->flip), co->T("Flip shape")))->OnClick.Handle(this, &ComboKeyScreen::onCombo);;
 
+	vertLayout->Add(new ItemHeader(co->T("Button Binding")));
 	vertLayout->Add(new CheckBox(&(cfg->toggle), co->T("Toggle mode")));
-
 	GridLayout *grid = vertLayout->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
 
 	std::map<std::string, ImageID> keyImages;
