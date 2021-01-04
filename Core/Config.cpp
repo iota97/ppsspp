@@ -165,8 +165,8 @@ struct ConfigSetting {
 		default_.touchPos = def;
 	}
 
-	ConfigSetting(const char *iniKey, const char *iniImage, const char *iniShape, const char *iniToggle, ConfigCustomButton *v, ConfigCustomButton def, bool save = true, bool perGame = false)
-		: ini_(iniKey), ini2_(iniImage), ini3_(iniShape), ini4_(iniToggle), type_(TYPE_CUSTOM_BUTTON), report_(false), save_(save), perGame_(perGame) {
+	ConfigSetting(const char *iniKey, const char *iniImage, const char *iniShape, const char *iniRotation, const char *iniToggle, ConfigCustomButton *v, ConfigCustomButton def, bool save = true, bool perGame = false)
+		: ini_(iniKey), ini2_(iniImage), ini3_(iniShape), ini4_(iniRotation), ini5_(iniToggle), type_(TYPE_CUSTOM_BUTTON), report_(false), save_(save), perGame_(perGame) {
 		ptr_.customButton = v;
 		cb_.customButton = nullptr;
 		default_.customButton = def;
@@ -272,7 +272,8 @@ struct ConfigSetting {
 			section->Get(ini_, &ptr_.customButton->key, default_.customButton.key);
 			section->Get(ini2_, &ptr_.customButton->image, default_.customButton.image);
 			section->Get(ini3_, &ptr_.customButton->shape, default_.customButton.shape);
-			section->Get(ini4_, &ptr_.customButton->toggle, default_.customButton.toggle);
+			section->Get(ini4_, &ptr_.customButton->rotation, default_.customButton.rotation);
+			section->Get(ini5_, &ptr_.customButton->toggle, default_.customButton.toggle);
 			return true;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
@@ -311,7 +312,8 @@ struct ConfigSetting {
 			section->Set(ini_, ptr_.customButton->key);
 			section->Set(ini2_, ptr_.customButton->image);
 			section->Set(ini3_, ptr_.customButton->shape);
-			section->Set(ini4_, ptr_.customButton->toggle);
+			section->Set(ini4_, ptr_.customButton->rotation);
+			section->Set(ini5_, ptr_.customButton->toggle);
 			return;
 		default:
 			_dbg_assert_msg_(false, "Unexpected ini setting type");
@@ -350,6 +352,7 @@ struct ConfigSetting {
 	const char *ini2_;
 	const char *ini3_;
 	const char *ini4_;
+	const char *ini5_;
 	Type type_;
 	bool report_;
 	bool save_;
@@ -896,11 +899,16 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("ShowTouchSquare", &g_Config.bShowTouchSquare, true, true, true),
 	ConfigSetting("ShowTouchTriangle", &g_Config.bShowTouchTriangle, true, true, true),
 
-	ConfigSetting("Custom0Mapping", "Custom0Image", "Custom0Shape", "Custom0Toggle", &g_Config.CustomKey0, {0, 0, 0, false}, true, true),
-	ConfigSetting("Custom1Mapping", "Custom1Image", "Custom1Shape", "Custom1Toggle", &g_Config.CustomKey1, {0, 1, 0, false}, true, true),
-	ConfigSetting("Custom2Mapping", "Custom2Image", "Custom2Shape", "Custom2Toggle", &g_Config.CustomKey2, {0, 2, 0, false}, true, true),
-	ConfigSetting("Custom3Mapping", "Custom3Image", "Custom3Shape", "Custom3Toggle", &g_Config.CustomKey3, {0, 3, 0, false}, true, true),
-	ConfigSetting("Custom4Mapping", "Custom4Image", "Custom4Shape", "Custom4Toggle", &g_Config.CustomKey4, {0, 4, 0, false}, true, true),
+	ConfigSetting("Custom0Mapping", "Custom0Image", "Custom0Shape", "Custom0Rotation", "Custom0Toggle", &g_Config.CustomKey0, {0, 0, 0, 0.0f, false}, true, true),
+	ConfigSetting("Custom1Mapping", "Custom1Image", "Custom1Shape", "Custom1Rotation",  "Custom1Toggle", &g_Config.CustomKey1, {0, 1, 0, 0.0f, false}, true, true),
+	ConfigSetting("Custom2Mapping", "Custom2Image", "Custom2Shape", "Custom2Rotation",  "Custom2Toggle", &g_Config.CustomKey2, {0, 2, 0, 0.0f, false}, true, true),
+	ConfigSetting("Custom3Mapping", "Custom3Image", "Custom3Shape", "Custom3Rotation",  "Custom3Toggle", &g_Config.CustomKey3, {0, 3, 0, 0.0f, false}, true, true),
+	ConfigSetting("Custom4Mapping", "Custom4Image", "Custom4Shape", "Custom4Rotation",  "Custom4Toggle", &g_Config.CustomKey4, {0, 4, 0, 0.0f, false}, true, true),
+	ConfigSetting("Custom5Mapping", "Custom5Image", "Custom5Shape", "Custom5Rotation",  "Custom5Toggle", &g_Config.CustomKey5, {0, 0, 1, 0.0f, false}, true, true),
+	ConfigSetting("Custom6Mapping", "Custom6Image", "Custom6Shape", "Custom6Rotation",  "Custom6Toggle", &g_Config.CustomKey6, {0, 1, 1, 0.0f, false}, true, true),
+	ConfigSetting("Custom7Mapping", "Custom7Image", "Custom7Shape", "Custom7Rotation",  "Custom7Toggle", &g_Config.CustomKey7, {0, 2, 1, 0.0f, false}, true, true),
+	ConfigSetting("Custom8Mapping", "Custom8Image", "Custom8Shape", "Custom8Rotation",  "Custom8Toggle", &g_Config.CustomKey8, {0, 3, 1, 0.0f, false}, true, true),
+	ConfigSetting("Custom9Mapping", "Custom9Image", "Custom9Shape", "Custom9Rotation",  "Custom9Toggle", &g_Config.CustomKey9, {0, 4, 1, 0.0f, false}, true, true),
 
 #if defined(_WIN32)
 	// A win32 user seeing touch controls is likely using PPSSPP on a tablet. There it makes
@@ -959,6 +967,12 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("fcombo2X", "fcombo2Y", "comboKeyScale2", "ShowComboKey2", &g_Config.touchCombo2, defaultTouchPosHide, true, true),
 	ConfigSetting("fcombo3X", "fcombo3Y", "comboKeyScale3", "ShowComboKey3", &g_Config.touchCombo3, defaultTouchPosHide, true, true),
 	ConfigSetting("fcombo4X", "fcombo4Y", "comboKeyScale4", "ShowComboKey4", &g_Config.touchCombo4, defaultTouchPosHide, true, true),
+	ConfigSetting("fcombo5X", "fcombo5Y", "comboKeyScale5", "ShowComboKey5", &g_Config.touchCombo5, defaultTouchPosHide, true, true),
+	ConfigSetting("fcombo6X", "fcombo6Y", "comboKeyScale6", "ShowComboKey6", &g_Config.touchCombo6, defaultTouchPosHide, true, true),
+	ConfigSetting("fcombo7X", "fcombo7Y", "comboKeyScale7", "ShowComboKey7", &g_Config.touchCombo7, defaultTouchPosHide, true, true),
+	ConfigSetting("fcombo8X", "fcombo8Y", "comboKeyScale8", "ShowComboKey8", &g_Config.touchCombo8, defaultTouchPosHide, true, true),
+	ConfigSetting("fcombo9X", "fcombo9Y", "comboKeyScale9", "ShowComboKey9", &g_Config.touchCombo9, defaultTouchPosHide, true, true),
+
 	ConfigSetting("Speed1KeyX", "Speed1KeyY", "Speed1KeyScale", "ShowSpeed1Key", &g_Config.touchSpeed1Key, defaultTouchPosHide, true, true),
 	ConfigSetting("Speed2KeyX", "Speed2KeyY", "Speed2KeyScale", "ShowSpeed2Key", &g_Config.touchSpeed2Key, defaultTouchPosHide, true, true),
 	ConfigSetting("RapidFireKeyX", "RapidFireKeyY", "RapidFireKeyScale", "ShowRapidFireKey", &g_Config.touchRapidFireKey, defaultTouchPosHide, true, true),
@@ -1800,6 +1814,11 @@ void Config::ResetControlLayout() {
 	reset(g_Config.touchCombo2);
 	reset(g_Config.touchCombo3);
 	reset(g_Config.touchCombo4);
+	reset(g_Config.touchCombo5);
+	reset(g_Config.touchCombo6);
+	reset(g_Config.touchCombo7);
+	reset(g_Config.touchCombo8);
+	reset(g_Config.touchCombo9);
 	reset(g_Config.touchSpeed1Key);
 	reset(g_Config.touchSpeed2Key);
 	reset(g_Config.touchRapidFireKey);

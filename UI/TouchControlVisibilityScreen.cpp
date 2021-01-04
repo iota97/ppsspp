@@ -113,6 +113,26 @@ void TouchControlVisibilityScreen::CreateViews() {
 		screenManager()->push(new ComboKeyScreen(4));
 		return UI::EVENT_DONE;
 	}});
+	toggles_.push_back({ "Custom 6", &g_Config.touchCombo5.show, comboKeyImages[g_Config.CustomKey5.image], [=](EventParams &e) {
+		screenManager()->push(new ComboKeyScreen(5));
+		return UI::EVENT_DONE;
+	}});
+	toggles_.push_back({ "Custom 7", &g_Config.touchCombo6.show, comboKeyImages[g_Config.CustomKey6.image], [=](EventParams &e) {
+		screenManager()->push(new ComboKeyScreen(6));
+		return UI::EVENT_DONE;
+	}});
+	toggles_.push_back({ "Custom 8", &g_Config.touchCombo7.show, comboKeyImages[g_Config.CustomKey7.image], [=](EventParams &e) {
+		screenManager()->push(new ComboKeyScreen(7));
+		return UI::EVENT_DONE;
+	}});
+	toggles_.push_back({ "Custom 9", &g_Config.touchCombo8.show, comboKeyImages[g_Config.CustomKey8.image], [=](EventParams &e) {
+		screenManager()->push(new ComboKeyScreen(8));
+		return UI::EVENT_DONE;
+	}});
+	toggles_.push_back({ "Custom 10", &g_Config.touchCombo9.show, comboKeyImages[g_Config.CustomKey9.image], [=](EventParams &e) {
+		screenManager()->push(new ComboKeyScreen(9));
+		return UI::EVENT_DONE;
+	}});
 	toggles_.push_back({ "Alt speed 1", &g_Config.touchSpeed1Key.show, ImageID::invalid(), nullptr });
 	toggles_.push_back({ "Alt speed 2", &g_Config.touchSpeed2Key.show, ImageID::invalid(), nullptr });
 	toggles_.push_back({ "RapidFire", &g_Config.touchRapidFireKey.show, ImageID::invalid(), nullptr });

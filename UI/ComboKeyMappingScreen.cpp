@@ -84,6 +84,36 @@ void ComboKeyScreen::CreateViews() {
 		for (int i = 0; i < 29; i++)
 			array[i] = (0x01 == ((g_Config.CustomKey4.key >> i) & 0x01));
 		break;
+	case 5: 
+		cfg = &g_Config.CustomKey5;
+		show = &g_Config.touchCombo5.show;
+		for (int i = 0; i < 29; i++)
+			array[i] = (0x01 == ((g_Config.CustomKey5.key >> i) & 0x01));
+		break;
+	case 6:
+		cfg = &g_Config.CustomKey6;
+		show = &g_Config.touchCombo6.show;
+		for (int i = 0; i < 29; i++)
+			array[i] = (0x01 == ((g_Config.CustomKey6.key >> i) & 0x01));
+		break;
+	case 7:
+		cfg = &g_Config.CustomKey7;
+		show = &g_Config.touchCombo7.show;
+		for (int i = 0; i < 29; i++)
+			array[i] = (0x01 == ((g_Config.CustomKey7.key >> i) & 0x01));
+		break;
+	case 8:
+		cfg = &g_Config.CustomKey8;
+		show = &g_Config.touchCombo8.show;
+		for (int i = 0; i < 29; i++)
+			array[i] = (0x01 == ((g_Config.CustomKey8.key >> i) & 0x01));
+		break;
+	case 9:
+		cfg = &g_Config.CustomKey9;
+		show = &g_Config.touchCombo9.show;
+		for (int i = 0; i < 29; i++)
+			array[i] = (0x01 == ((g_Config.CustomKey9.key >> i) & 0x01));
+		break;
 	default:
 		// This shouldn't happen, let's just not crash.
 		cfg = &g_Config.CustomKey0;
@@ -107,9 +137,13 @@ void ComboKeyScreen::CreateViews() {
 	rightScroll_->Add(vertLayout);
 	
 	vertLayout->Add(new CheckBox(show, co->T("Visible")));
+
 	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow" };
 	PopupMultiChoice *icon = vertLayout->Add(new PopupMultiChoice(&(cfg->image), co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
 	icon->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
+
+	vertLayout->Add(new PopupSliderChoiceFloat(&(cfg->rotation), -180.0f, 180.0f, co->T("Icon rotation"), 5.0f, screenManager()))->OnClick.Handle(this, &ComboKeyScreen::onCombo);
+	
 	static const char *shapeNames[] = { "Circle", "Rectangle" };
 	vertLayout->Add(new PopupMultiChoice(&(cfg->shape), co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()))->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
 	vertLayout->Add(new CheckBox(&(cfg->toggle), co->T("Toggle mode")));
@@ -194,7 +228,7 @@ static int arrayToInt(bool ary[29]) {
 	return value >> 1;
 }
 
-void ComboKeyScreen::onFinish(DialogResult result) {
+void ComboKeyScreen::saveArray() {
 	switch (id_) {
 	case 0:
 		g_Config.CustomKey0.key = arrayToInt(array);
@@ -211,7 +245,26 @@ void ComboKeyScreen::onFinish(DialogResult result) {
 	case 4:
 		g_Config.CustomKey4.key = arrayToInt(array);
 		break;
+	case 5:
+		g_Config.CustomKey5.key = arrayToInt(array);
+		break;
+	case 6:
+		g_Config.CustomKey6.key = arrayToInt(array);
+		break;
+	case 7:
+		g_Config.CustomKey7.key = arrayToInt(array);
+		break;
+	case 8:
+		g_Config.CustomKey8.key = arrayToInt(array);
+		break;
+	case 9:
+		g_Config.CustomKey9.key = arrayToInt(array);
+		break;
 	}
+}
+
+void ComboKeyScreen::onFinish(DialogResult result) {
+	saveArray();
 	g_Config.Save("ComboKeyScreen::onFinish");
 }
 
@@ -221,23 +274,7 @@ UI::EventReturn ComboKeyScreen::ChoiceEventHandler::onChoiceClick(UI::EventParam
 };
 
 UI::EventReturn ComboKeyScreen::onCombo(UI::EventParams &e) {
-	switch (id_) {
-	case 0:
-		g_Config.CustomKey0.key = arrayToInt(array);
-		break;
-	case 1:
-		g_Config.CustomKey1.key = arrayToInt(array);
-		break;
-	case 2:
-		g_Config.CustomKey2.key = arrayToInt(array);
-		break;
-	case 3:
-		g_Config.CustomKey3.key = arrayToInt(array);
-		break;
-	case 4:
-		g_Config.CustomKey4.key = arrayToInt(array);
-		break;
-	}
+	saveArray();
 	CreateViews();
 	return UI::EVENT_DONE;
 }

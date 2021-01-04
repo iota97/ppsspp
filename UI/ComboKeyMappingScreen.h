@@ -33,6 +33,8 @@ public:
 	void onFinish(DialogResult result) override;
 	UI::EventReturn onCombo(UI::EventParams &e);
 private:
+
+	void saveArray();
 	bool array[29];
 	int id_;
 	UI::ChoiceStrip *comboselect;

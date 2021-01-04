@@ -769,6 +769,26 @@ void InitPadLayout(float xres, float yres, float globalScale) {
 	int combo4_key_X = halfW + bottom_key_spacing * scale * 2.2f;
 	int combo4_key_Y = yres / 3;
 	initTouchPos(g_Config.touchCombo4, combo4_key_X, combo4_key_Y);
+
+	int combo5_key_X = halfW - bottom_key_spacing * scale * 1.2f;
+	int combo5_key_Y = yres / 2;
+	initTouchPos(g_Config.touchCombo5, combo5_key_X, combo5_key_Y);
+
+	int combo6_key_X = halfW - bottom_key_spacing * scale * 2.2f;
+	int combo6_key_Y = yres / 2;
+	initTouchPos(g_Config.touchCombo6, combo6_key_X, combo6_key_Y);
+
+	int combo7_key_X = halfW - bottom_key_spacing * scale * 3.2f;
+	int combo7_key_Y = yres / 2;
+	initTouchPos(g_Config.touchCombo7, combo7_key_X, combo7_key_Y);
+
+	int combo8_key_X = halfW - bottom_key_spacing * scale * 1.2f;
+	int combo8_key_Y = yres / 3;
+	initTouchPos(g_Config.touchCombo8, combo8_key_X, combo8_key_Y);
+
+	int combo9_key_X = halfW - bottom_key_spacing * scale * 2.2f;
+	int combo9_key_Y = yres / 3;
+	initTouchPos(g_Config.touchCombo9, combo9_key_X, combo9_key_Y);
 }
 
 UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* emuScreen) {
@@ -818,9 +838,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	};
 	auto addComboKey = [=](const ConfigCustomButton& cfg, const ConfigTouchPos &touch) -> ComboKey * {
 		if (touch.show) {
-			return root->Add(new ComboKey(cfg.key, cfg.toggle, emuScreen, 
+			auto aux = root->Add(new ComboKey(cfg.key, cfg.toggle, emuScreen, 
 					cfg.shape ? rectImage : roundImage, cfg.shape ? ImageID("I_RECT") : ImageID("I_ROUND"), 
 					comboKeyImages[cfg.image], touch.scale, buttonLayoutParams(touch)));
+			aux->SetAngle(cfg.rotation, 180.0f);
+			return aux;
 		}
 		return nullptr;
 	};
@@ -910,6 +932,11 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	addComboKey(g_Config.CustomKey2, g_Config.touchCombo2);
 	addComboKey(g_Config.CustomKey3, g_Config.touchCombo3);
 	addComboKey(g_Config.CustomKey4, g_Config.touchCombo4);
+	addComboKey(g_Config.CustomKey5, g_Config.touchCombo5);
+	addComboKey(g_Config.CustomKey6, g_Config.touchCombo6);
+	addComboKey(g_Config.CustomKey7, g_Config.touchCombo7);
+	addComboKey(g_Config.CustomKey8, g_Config.touchCombo8);
+	addComboKey(g_Config.CustomKey9, g_Config.touchCombo9);
 	
 	return root;
 }

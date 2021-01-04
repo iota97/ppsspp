@@ -401,11 +401,26 @@ void ControlLayoutView::CreateViews() {
 
 	addDragDropButton(g_Config.touchAnalogStick, stickBg, stickImage);
 	addDragDropButton(g_Config.touchRightAnalogStick, stickBg, stickImage);
-	addDragDropButton(g_Config.touchCombo0, g_Config.CustomKey0.shape ? rectImage : roundImage, comboKeyImages[g_Config.CustomKey0.image]);
-	addDragDropButton(g_Config.touchCombo1, g_Config.CustomKey1.shape ? rectImage : roundImage, comboKeyImages[g_Config.CustomKey1.image]);
-	addDragDropButton(g_Config.touchCombo2, g_Config.CustomKey2.shape ? rectImage : roundImage, comboKeyImages[g_Config.CustomKey2.image]);
-	addDragDropButton(g_Config.touchCombo3, g_Config.CustomKey3.shape ? rectImage : roundImage, comboKeyImages[g_Config.CustomKey3.image]);
-	addDragDropButton(g_Config.touchCombo4, g_Config.CustomKey4.shape ? rectImage : roundImage, comboKeyImages[g_Config.CustomKey4.image]);
+
+	auto addDragComboKey = [&](ConfigTouchPos &pos, const ConfigCustomButton& cfg) {
+		DragDropButton *b = nullptr;
+		if (pos.show) {
+			b = new DragDropButton(pos, cfg.shape ? rectImage : roundImage, comboKeyImages[cfg.image], bounds);
+			b->SetAngle(cfg.rotation, 180.f);
+			controls_.push_back(b);
+		}
+		return b;
+	};
+	addDragComboKey(g_Config.touchCombo0, g_Config.CustomKey0);
+	addDragComboKey(g_Config.touchCombo1, g_Config.CustomKey1);
+	addDragComboKey(g_Config.touchCombo2, g_Config.CustomKey2);
+	addDragComboKey(g_Config.touchCombo3, g_Config.CustomKey3);
+	addDragComboKey(g_Config.touchCombo4, g_Config.CustomKey4);
+	addDragComboKey(g_Config.touchCombo5, g_Config.CustomKey5);
+	addDragComboKey(g_Config.touchCombo6, g_Config.CustomKey6);
+	addDragComboKey(g_Config.touchCombo7, g_Config.CustomKey7);
+	addDragComboKey(g_Config.touchCombo8, g_Config.CustomKey8);
+	addDragComboKey(g_Config.touchCombo9, g_Config.CustomKey9);
 
 	for (size_t i = 0; i < controls_.size(); i++) {
 		Add(controls_[i]);

@@ -57,6 +57,7 @@ struct ConfigCustomButton {
 	int key;
 	int image;
 	int shape;
+	float rotation;
 	bool toggle;
 };
 
@@ -355,6 +356,12 @@ public:
 	ConfigTouchPos touchCombo2;
 	ConfigTouchPos touchCombo3;
 	ConfigTouchPos touchCombo4;
+	ConfigTouchPos touchCombo5;
+	ConfigTouchPos touchCombo6;
+	ConfigTouchPos touchCombo7;
+	ConfigTouchPos touchCombo8;
+	ConfigTouchPos touchCombo9;
+
 	ConfigTouchPos touchSpeed1Key;
 	ConfigTouchPos touchSpeed2Key;
 	ConfigTouchPos touchRapidFireKey;
@@ -373,7 +380,12 @@ public:
 	ConfigCustomButton CustomKey1;
 	ConfigCustomButton CustomKey2;
 	ConfigCustomButton CustomKey3;
-	ConfigCustomButton CustomKey4;	
+	ConfigCustomButton CustomKey4;
+	ConfigCustomButton CustomKey5;
+	ConfigCustomButton CustomKey6;
+	ConfigCustomButton CustomKey7;
+	ConfigCustomButton CustomKey8;
+	ConfigCustomButton CustomKey9;	
 
 	// Ignored on iOS and other platforms that lack pause.
 	bool bShowTouchPause;
