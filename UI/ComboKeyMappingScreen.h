@@ -18,6 +18,7 @@
 #pragma once
 
 #include "MiscScreens.h"
+#include "UI/GamepadEmu.h"
 
 #include <map>
 
@@ -35,7 +36,7 @@ public:
 private:
 
 	void saveArray();
-	bool array[29];
+	bool array[ARRAY_SIZE(CustomKey::comboKeyList)];
 	int id_;
 	UI::ChoiceStrip *comboselect;
 	UI::ScrollView *rightScroll_;

@@ -57,9 +57,7 @@ struct ConfigCustomButton {
 	uint64_t key;
 	int image;
 	int shape;
-	float rotation;
 	bool toggle;
-	bool flip;
 };
 
 struct Config {
@@ -308,8 +306,6 @@ public:
 	bool bGridView1;
 	bool bGridView2;
 	bool bGridView3;
-	//Combo key screen flag
-	int iComboMode;
 
 	// Right analog binding
 	int iRightAnalogUp;
@@ -357,6 +353,7 @@ public:
 	float fDpadSpacing;
 	ConfigTouchPos touchStartKey;
 	ConfigTouchPos touchSelectKey;
+	ConfigTouchPos touchUnthrottleKey;
 	ConfigTouchPos touchLKey;
 	ConfigTouchPos touchRKey;
 	ConfigTouchPos touchAnalogStick;
