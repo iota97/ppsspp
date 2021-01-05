@@ -30,7 +30,6 @@
 #include "Core/Core.h"
 #include "Core/System.h"
 #include "Core/HLE/sceCtrl.h"
-#include "Core/KeyMap.h"
 #include "UI/GamepadEmu.h"
 
 static u32 GetButtonColor() {
@@ -741,7 +740,7 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 					g_Config.iTouchButtonStyle == 0 ? comboKeyShapes[cfg.shape].i : comboKeyShapes[cfg.shape].l, comboKeyShapes[cfg.shape].i, 
 					comboKeyImages[cfg.image].i, touch.scale, buttonLayoutParams(touch)));
 			aux->SetAngle(comboKeyImages[cfg.image].r, comboKeyShapes[cfg.shape].r);
-			aux->FlipImageH(comboKeyShapes[cfg.image].f);
+			aux->FlipImageH(comboKeyShapes[cfg.shape].f);
 			return aux;
 		}
 		return nullptr;

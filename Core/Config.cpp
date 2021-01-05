@@ -108,7 +108,7 @@ struct ConfigSetting {
 		BoolDefaultCallback b;
 		IntDefaultCallback i;
 		Uint32DefaultCallback u;
-		Uint32DefaultCallback lu;
+		Uint64DefaultCallback lu;
 		FloatDefaultCallback f;
 		StringDefaultCallback s;
 		TouchPosDefaultCallback touchPos;
@@ -371,8 +371,6 @@ struct ConfigSetting {
 	const char *ini2_;
 	const char *ini3_;
 	const char *ini4_;
-	const char *ini5_;
-	const char *ini6_;
 	Type type_;
 	bool report_;
 	bool save_;

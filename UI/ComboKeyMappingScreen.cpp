@@ -32,15 +32,11 @@
 
 #include "UI/ComboKeyMappingScreen.h"
 
-class ButtonPreview : public MultiTouchButton {
+class ButtonPreview : public UI::View {
 public:
 	ButtonPreview(ImageID bgImg, ImageID img, float rotationIcon, bool flipShape, float rotationShape, int x, int y)
-	: MultiTouchButton(bgImg, bgImg, img, 1.0f, new UI::AnchorLayoutParams(x, y, UI::NONE, UI::NONE, true)),
-		x_(x), y_(y), rotI_(rotationIcon), bgImg_(bgImg), img_(img), flipS_(flipShape), rotS_(rotationShape) {
-	}
-	bool IsDown() override {
-		return false;
-	}
+		: View(new UI::AnchorLayoutParams(x, y, UI::NONE, UI::NONE, true)), bgImg_(bgImg), img_(img), rotI_(rotationIcon),
+		flipS_(flipShape), rotS_(rotationShape), x_(x), y_(y) {}
 
 	void Draw(UIContext &dc) override {
 		float opacity = g_Config.iTouchButtonOpacity / 100.0f;
@@ -153,16 +149,12 @@ void ComboKeyScreen::CreateViews() {
 	leftColumn->Add(new Choice(di->T("Back")))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
 	root__->Add(rightScroll_);
 
-	const int cellSize = 400;
-	UI::GridLayoutSettings gridsettings(cellSize, 64, 5);
-	gridsettings.fillCells = true;
 	LinearLayout *vertLayout = new LinearLayout(ORIENT_VERTICAL);
 	rightScroll_->Add(vertLayout);
 	
 	vertLayout->Add(new ItemHeader(co->T("Button Style")));
 	vertLayout->Add(new CheckBox(show, co->T("Visible")));
 
-	
 	// All icon and name are defined in GamepadEmu.h
 	static const char *imageNames[ARRAY_SIZE(comboKeyImages)];
 	for (int i = 0; i < ARRAY_SIZE(imageNames); ++i) {
@@ -181,8 +173,12 @@ void ComboKeyScreen::CreateViews() {
 	vertLayout->Add(new ItemHeader(co->T("Button Binding")));
 	vertLayout->Add(new CheckBox(&(cfg->toggle), co->T("Toggle mode")));
 
-	// Button name, image and action are defined in GamepadEmu.h
+	const int cellSize = 400;
+	UI::GridLayoutSettings gridsettings(cellSize, 64, 5);
+	gridsettings.fillCells = true;
 	GridLayout *grid = vertLayout->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
+
+	// Button name, image and action are defined in GamepadEmu.h
 	for (int i = 0; i < ARRAY_SIZE(comboKeyList); ++i) {
 		LinearLayout *row = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(FILL_PARENT, WRAP_CONTENT));
 		row->SetSpacing(0);

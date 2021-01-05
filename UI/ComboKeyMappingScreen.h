@@ -34,8 +34,8 @@ public:
 	void onFinish(DialogResult result) override;
 	UI::EventReturn onCombo(UI::EventParams &e);
 private:
-
 	void saveArray();
+
 	bool array[ARRAY_SIZE(CustomKey::comboKeyList)];
 	int id_;
 	UI::ChoiceStrip *comboselect;
