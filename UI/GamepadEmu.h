@@ -297,5 +297,5 @@ namespace CustomKey {
 		{ "Record", ImageID::invalid(), VIRTKEY_RECORD },
 #endif
 	};
-	static_assert(ARRAY_SIZE(comboKeyList) <= 64);
+	static_assert(ARRAY_SIZE(comboKeyList) <= 64, "Too many key for a uint64_t bit mask");
 };

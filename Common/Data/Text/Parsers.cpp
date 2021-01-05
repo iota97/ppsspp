@@ -71,7 +71,6 @@ bool TryParse(const std::string &str, uint32_t *const output) {
 	return true;
 }
 
-
 bool TryParse(const std::string &str, uint64_t *const output) {
 	char *endptr = NULL;
 
