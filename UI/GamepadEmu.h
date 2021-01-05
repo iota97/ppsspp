@@ -168,14 +168,28 @@ const int baseActionButtonSpacing = 60;
 
 class ComboKey : public MultiTouchButton {
 public:
-	ComboKey(int pspButtonBit, bool toggle, EmuScreen* emuScreen, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
+	ComboKey(uint64_t pspButtonBit, bool toggle, EmuScreen* emuScreen, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
 		: MultiTouchButton(bgImg, bgDownImg, img, scale, layoutParams), pspButtonBit_(pspButtonBit), toggle_(toggle), emuScreen_(emuScreen), on_(false) {
 	}
 	void Touch(const TouchInput &input) override;
 	bool IsDown() override;
 private:
-	int pspButtonBit_;
+	uint64_t pspButtonBit_;
 	bool toggle_;
 	EmuScreen* emuScreen_;
 	bool on_;
+};
+
+static const ImageID comboKeyImages[] = {
+	ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
+	ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
+	ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"),
+	ImageID("I_ARROW"), ImageID("I_GEAR")
+};
+
+static const ImageID comboKeyShape[][2] = {
+	{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
+	{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
+	{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") },
+	{ ImageID("I_DIR"), ImageID("I_DIR_LINE") },
 };

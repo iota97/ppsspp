@@ -353,18 +353,6 @@ void ControlLayoutView::CreateViews() {
 	ImageID stickBg = g_Config.iTouchButtonStyle ? ImageID("I_STICK_BG_LINE") : ImageID("I_STICK_BG");
 	ImageID roundImage = g_Config.iTouchButtonStyle ? ImageID("I_ROUND_LINE") : ImageID("I_ROUND");
 
-	static const ImageID comboKeyImages[] = {
-		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
-		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
-		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
-	};
-
-	static const ImageID comboKeyShape[][2] = {
-		{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
-		{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
-		{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") }
-	};
-
 	auto addDragDropButton = [&](ConfigTouchPos &pos, ImageID bgImg, ImageID img) {
 		DragDropButton *b = nullptr;
 		if (pos.show) {

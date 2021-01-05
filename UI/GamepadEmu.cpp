@@ -751,17 +751,6 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 	const ImageID dirImage = g_Config.iTouchButtonStyle ? ImageID("I_DIR_LINE") : ImageID("I_DIR");
 	const ImageID stickImage = g_Config.iTouchButtonStyle ? ImageID("I_STICK_LINE") : ImageID("I_STICK");
 	const ImageID stickBg = g_Config.iTouchButtonStyle ? ImageID("I_STICK_BG_LINE") : ImageID("I_STICK_BG");
-	static const ImageID comboKeyImages[] = {
-		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
-		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
-		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
-	};
-
-	static const ImageID comboKeyShape[][2] = {
-		{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
-		{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
-		{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") }
-	};
 
 	auto addPSPButton = [=](int buttonBit, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch, ButtonOffset off = { 0, 0 }) -> PSPButton * {
 		if (touch.show) {

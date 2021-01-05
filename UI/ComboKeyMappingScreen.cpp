@@ -31,7 +31,6 @@
 #include "Core/Config.h"
 #include "UI/GamepadEmu.h"
 
-#include "TouchControlVisibilityScreen.h"
 #include "UI/ComboKeyMappingScreen.h"
 
 class ButtonPreview : public MultiTouchButton {
@@ -72,18 +71,6 @@ void ComboKeyScreen::CreateViews() {
 	root_->Add(root__);
 	LinearLayout *leftColumn = new LinearLayout(ORIENT_VERTICAL, new LinearLayoutParams(120, FILL_PARENT));
 	auto di = GetI18NCategory("Dialog");
-
-	static const ImageID comboKeyImages[] = {
-		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
-		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
-		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
-	};
-
-	static const ImageID comboKeyShape[][2] = {
-		{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
-		{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
-		{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") }
-	};
 
 	ConfigCustomButton* cfg = nullptr;
 	bool* show = nullptr;
@@ -173,13 +160,13 @@ void ComboKeyScreen::CreateViews() {
 	vertLayout->Add(new ItemHeader(co->T("Button Style")));
 	vertLayout->Add(new CheckBox(show, co->T("Visible")));
 
-	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow" };
+	static const char *imageNames[] = { "1", "2", "3", "4", "5", "Circle", "Cross", "Square", "Triangle", "L", "R", "Start", "Select", "Arrow", "Gear" };
 	PopupMultiChoice *icon = vertLayout->Add(new PopupMultiChoice(&(cfg->image), co->T("Icon"), imageNames, 0, ARRAY_SIZE(imageNames), mc->GetName(), screenManager()));
 	icon->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
 
 	vertLayout->Add(new PopupSliderChoiceFloat(&(cfg->rotation), -180.0f, 180.0f, co->T("Icon rotation"), 5.0f, screenManager()))->OnChange.Handle(this, &ComboKeyScreen::onCombo);
 	
-	static const char *shapeNames[] = { "Circle", "Rectangle", "Shoulder button" };
+	static const char *shapeNames[] = { "Circle", "Rectangle", "Shoulder button", "Arrow" };
 	vertLayout->Add(new PopupMultiChoice(&(cfg->shape), co->T("Shape"), shapeNames, 0, ARRAY_SIZE(shapeNames), mc->GetName(), screenManager()))->OnChoice.Handle(this, &ComboKeyScreen::onCombo);
 
 	vertLayout->Add(new CheckBox(&(cfg->flip), co->T("Flip shape")))->OnClick.Handle(this, &ComboKeyScreen::onCombo);;
