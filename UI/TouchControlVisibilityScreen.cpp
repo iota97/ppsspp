@@ -43,6 +43,7 @@ private:
 
 void TouchControlVisibilityScreen::CreateViews() {
 	using namespace UI;
+	using namespace CustomKey;
 
 	auto di = GetI18NCategory("Dialog");
 	auto co = GetI18NCategory("Controls");
@@ -71,12 +72,6 @@ void TouchControlVisibilityScreen::CreateViews() {
 	gridsettings.fillCells = true;
 	GridLayout *grid = vert->Add(new GridLayout(gridsettings, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
 
-	static const ImageID comboKeyImages[] = {
-		ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
-		ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
-		ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"), ImageID("I_ARROW")
-	};
-
 	toggles_.clear();
 	toggles_.push_back({ "Circle", &g_Config.bShowTouchCircle, ImageID("I_CIRCLE"), nullptr });
 	toggles_.push_back({ "Cross", &g_Config.bShowTouchCross, ImageID("I_CROSS"), nullptr });
@@ -93,43 +88,43 @@ void TouchControlVisibilityScreen::CreateViews() {
 		return UI::EVENT_DONE;
 	}});
 	toggles_.push_back({ "Unthrottle", &g_Config.touchUnthrottleKey.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "Custom 1", &g_Config.touchCombo0.show, comboKeyImages[g_Config.CustomKey0.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 1", &g_Config.touchCombo0.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(0));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 2", &g_Config.touchCombo1.show, comboKeyImages[g_Config.CustomKey1.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 2", &g_Config.touchCombo1.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(1));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 3", &g_Config.touchCombo2.show, comboKeyImages[g_Config.CustomKey2.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 3", &g_Config.touchCombo2.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(2));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 4", &g_Config.touchCombo3.show, comboKeyImages[g_Config.CustomKey3.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 4", &g_Config.touchCombo3.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(3));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 5", &g_Config.touchCombo4.show, comboKeyImages[g_Config.CustomKey4.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 5", &g_Config.touchCombo4.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(4));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 6", &g_Config.touchCombo5.show, comboKeyImages[g_Config.CustomKey5.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 6", &g_Config.touchCombo5.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(5));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 7", &g_Config.touchCombo6.show, comboKeyImages[g_Config.CustomKey6.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 7", &g_Config.touchCombo6.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(6));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 8", &g_Config.touchCombo7.show, comboKeyImages[g_Config.CustomKey7.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 8", &g_Config.touchCombo7.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(7));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 9", &g_Config.touchCombo8.show, comboKeyImages[g_Config.CustomKey8.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 9", &g_Config.touchCombo8.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(8));
 		return UI::EVENT_DONE;
 	}});
-	toggles_.push_back({ "Custom 10", &g_Config.touchCombo9.show, comboKeyImages[g_Config.CustomKey9.image], [=](EventParams &e) {
+	toggles_.push_back({ "Custom 10", &g_Config.touchCombo9.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(9));
 		return UI::EVENT_DONE;
 	}});
