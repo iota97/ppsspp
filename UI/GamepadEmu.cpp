@@ -172,59 +172,25 @@ bool ComboKey::IsDown() {
 }
 
 void ComboKey::Touch(const TouchInput &input) {
+	using namespace CustomKey;
 	bool lastDown = pointerDownMask_ != 0;
 	MultiTouchButton::Touch(input);
 	bool down = pointerDownMask_ != 0;
 
-	static const uint32_t keyList[] = {
-		// PSP controls
-		CTRL_SQUARE,
-		CTRL_TRIANGLE,
-		CTRL_CIRCLE,
-		CTRL_CROSS,
-		CTRL_UP,
-		CTRL_DOWN,
-		CTRL_LEFT,
-		CTRL_RIGHT,
-		CTRL_START,
-		CTRL_SELECT,
-		CTRL_LTRIGGER,
-		CTRL_RTRIGGER,
-
-		// Virtual key
-		VIRTKEY_RAPID_FIRE,
-		VIRTKEY_UNTHROTTLE,
-		VIRTKEY_SPEED_TOGGLE,
-		VIRTKEY_REWIND,
-		VIRTKEY_SAVE_STATE,
-		VIRTKEY_LOAD_STATE,
-		VIRTKEY_NEXT_SLOT,
-		VIRTKEY_TOGGLE_FULLSCREEN,
-		VIRTKEY_SPEED_CUSTOM1,
-		VIRTKEY_SPEED_CUSTOM2,
-		VIRTKEY_TEXTURE_DUMP,
-		VIRTKEY_TEXTURE_REPLACE,
-		VIRTKEY_SCREENSHOT,
-		VIRTKEY_MUTE_TOGGLE,
-		VIRTKEY_OPENCHAT,
-		VIRTKEY_ANALOG_ROTATE_CW,
-		VIRTKEY_ANALOG_ROTATE_CCW
-	};
-
 	if (down && !lastDown) {
 		if (g_Config.bHapticFeedback)
 			Vibrate(HAPTIC_VIRTUAL_KEY);
-		for (int i = 0; i < sizeof(keyList)/sizeof(keyList[0]); i++) {
-			if (pspButtonBit_ & (1 << i)) {
-				emuScreen_->pspKey(keyList[i], (on_ && toggle_) ? KEY_UP : KEY_DOWN);
+		for (int i = 0; i < ARRAY_SIZE(comboKeyList); i++) {
+			if (pspButtonBit_ & (1UL << i)) {
+				emuScreen_->pspKey(comboKeyList[i].c, (on_ && toggle_) ? KEY_UP : KEY_DOWN);
 			}
 		}
 		if (toggle_)
 			on_ = !on_;
 	} else if (!toggle_ && lastDown && !down) {
-		for (int i = 0; i < sizeof(keyList)/sizeof(keyList[0]); i++) {
-			if (pspButtonBit_ & (1 << i)) {
-				emuScreen_->pspKey(keyList[i], KEY_UP);
+		for (int i = 0; i < ARRAY_SIZE(comboKeyList); i++) {
+			if (pspButtonBit_ & (1UL << i)) {
+				emuScreen_->pspKey(comboKeyList[i].c, KEY_UP);
 			}
 		}
 	}
@@ -657,13 +623,17 @@ void InitPadLayout(float xres, float yres, float globalScale) {
 		bottom_key_spacing *= 0.8f;
 	}
 
-	int start_key_X = halfW + bottom_key_spacing/2 * scale;
+	int start_key_X = halfW + bottom_key_spacing * scale;
 	int start_key_Y = yres - 60 * scale;
 	initTouchPos(g_Config.touchStartKey, start_key_X, start_key_Y);
 
-	int select_key_X = halfW - bottom_key_spacing/2 * scale;
+	int select_key_X = halfW;
 	int select_key_Y = yres - 60 * scale;
 	initTouchPos(g_Config.touchSelectKey, select_key_X, select_key_Y);
+
+	int unthrottle_key_X = halfW - bottom_key_spacing * scale;
+	int unthrottle_key_Y = yres - 60 * scale;
+	initTouchPos(g_Config.touchUnthrottleKey, unthrottle_key_X, unthrottle_key_Y);
 
 	// L and R------------------------------------------------------------
 	// Put them above the analog stick / above the buttons to the right.
@@ -758,13 +728,20 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 		}
 		return nullptr;
 	};
+	auto addBoolButton = [=](bool *value, ImageID bgImg, ImageID bgDownImg, ImageID img, const ConfigTouchPos &touch) -> BoolButton * {
+		if (touch.show) {
+			return root->Add(new BoolButton(value, bgImg, bgDownImg, img, touch.scale, buttonLayoutParams(touch)));
+		}
+		return nullptr;
+	};
 	auto addComboKey = [=](const ConfigCustomButton& cfg, const ConfigTouchPos &touch) -> ComboKey * {
+		using namespace CustomKey;
 		if (touch.show) {
 			auto aux = root->Add(new ComboKey(cfg.key, cfg.toggle, emuScreen, 
-					comboKeyShape[cfg.shape][g_Config.iTouchButtonStyle != 0], comboKeyShape[cfg.shape][0], 
-					comboKeyImages[cfg.image], touch.scale, buttonLayoutParams(touch)));
-			aux->SetAngle(cfg.rotation, 0.0f);
-			aux->FlipImageH(cfg.flip);
+					g_Config.iTouchButtonStyle == 0 ? comboKeyShapes[cfg.shape].i : comboKeyShapes[cfg.shape].l, comboKeyShapes[cfg.shape].i, 
+					comboKeyImages[cfg.image].i, touch.scale, buttonLayoutParams(touch)));
+			aux->SetAngle(comboKeyImages[cfg.image].r, comboKeyShapes[cfg.shape].r);
+			aux->FlipImageH(comboKeyShapes[cfg.image].f);
 			return aux;
 		}
 		return nullptr;
@@ -786,6 +763,18 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, EmuScreen* e
 
 	addPSPButton(CTRL_START, rectImage, ImageID("I_RECT"), ImageID("I_START"), g_Config.touchStartKey);
 	addPSPButton(CTRL_SELECT, rectImage, ImageID("I_RECT"), ImageID("I_SELECT"), g_Config.touchSelectKey);
+
+	BoolButton *unthrottle = addBoolButton(&PSP_CoreParameter().unthrottle, rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchUnthrottleKey);
+	if (unthrottle) {
+		unthrottle->SetAngle(180.0f);
+		unthrottle->OnChange.Add([](UI::EventParams &e) {
+			if (e.a && coreState == CORE_STEPPING) {
+				Core_EnableStepping(false);
+			}
+			return UI::EVENT_DONE;
+		});
+	}
+
 	addPSPButton(CTRL_LTRIGGER, shoulderImage, ImageID("I_SHOULDER"), ImageID("I_L"), g_Config.touchLKey);
 	PSPButton *rTrigger = addPSPButton(CTRL_RTRIGGER, shoulderImage, ImageID("I_SHOULDER"), ImageID("I_R"), g_Config.touchRKey);
 	if (rTrigger)

@@ -329,6 +329,7 @@ void ControlLayoutView::Touch(const TouchInput &touch) {
 }
 
 void ControlLayoutView::CreateViews() {
+	using namespace CustomKey;
 	const Bounds &bounds = GetBounds();
 	if (bounds.w == 0.0f || bounds.h == 0.0f) {
 		// Layout hasn't happened yet, return.
@@ -368,6 +369,11 @@ void ControlLayoutView::CreateViews() {
 
 	addDragDropButton(g_Config.touchSelectKey, rectImage, ImageID("I_SELECT"));
 	addDragDropButton(g_Config.touchStartKey, rectImage, ImageID("I_START"));
+
+	if (auto *unthrottle = addDragDropButton(g_Config.touchUnthrottleKey, rectImage, ImageID("I_ARROW"))) {
+		unthrottle->SetAngle(180.0f);
+	}
+
 	addDragDropButton(g_Config.touchLKey, shoulderImage, ImageID("I_L"));
 	if (auto *rbutton = addDragDropButton(g_Config.touchRKey, shoulderImage, ImageID("I_R"))) {
 		rbutton->FlipImageH(true);
@@ -379,9 +385,9 @@ void ControlLayoutView::CreateViews() {
 	auto addDragComboKey = [&](ConfigTouchPos &pos, const ConfigCustomButton& cfg) {
 		DragDropButton *b = nullptr;
 		if (pos.show) {
-			b = new DragDropButton(pos, comboKeyShape[cfg.shape][g_Config.iTouchButtonStyle != 0], comboKeyImages[cfg.image], bounds);
-			b->FlipImageH(cfg.flip);
-			b->SetAngle(cfg.rotation, 0.f);
+			b = new DragDropButton(pos, g_Config.iTouchButtonStyle == 0 ? comboKeyShapes[cfg.shape].i : comboKeyShapes[cfg.shape].l, comboKeyImages[cfg.image].i, bounds);
+			b->FlipImageH(comboKeyShapes[cfg.shape].f);
+			b->SetAngle(comboKeyImages[cfg.image].r, comboKeyShapes[cfg.shape].r);
 			controls_.push_back(b);
 		}
 		return b;

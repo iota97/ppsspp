@@ -180,16 +180,94 @@ private:
 	bool on_;
 };
 
-static const ImageID comboKeyImages[] = {
-	ImageID("I_1"), ImageID("I_2"), ImageID("I_3"), ImageID("I_4"), ImageID("I_5"),
-	ImageID("I_CIRCLE"), ImageID("I_CROSS"), ImageID("I_SQUARE"), ImageID("I_TRIANGLE"),
-	ImageID("I_L"), ImageID("I_R"), ImageID("I_START"), ImageID("I_SELECT"),
-	ImageID("I_ARROW"), ImageID("I_GEAR")
-};
+// Just edit this to add new image, shape or button function
+namespace CustomKey {
+	// Image list
+	struct keyImage {
+		const char* n; // UI name
+		ImageID i; // ImageID
+		float r; // Rotation angle in degree
+	};
+	static const keyImage comboKeyImages[] = {
+		{ "1", ImageID("I_1"), 0.0f },
+		{ "2", ImageID("I_2"), 0.0f },
+		{ "3", ImageID("I_3"), 0.0f },
+		{ "4", ImageID("I_4"), 0.0f },
+		{ "5", ImageID("I_5"), 0.0f },
+		{ "Circle", ImageID("I_CIRCLE"), 0.0f },
+		{ "Cross", ImageID("I_CROSS"), 0.0f },
+		{ "Square", ImageID("I_SQUARE"), 0.0f },
+		{ "Triangle", ImageID("I_TRIANGLE"), 0.0f },
+		{ "L", ImageID("I_L"), 0.0f },
+		{ "R", ImageID("I_R"),  0.0f },
+		{ "Start", ImageID("I_START"), 0.0f },
+		{ "Select", ImageID("I_SELECT"), 0.0f },
+		{ "Plus", ImageID("I_CROSS"), 45.0f },
+		{ "Rhombus", ImageID("I_SQUARE"), 45.0f },
+		{ "Down Triangle", ImageID("I_TRIANGLE"), 180.0f },
+		{ "Arrow up", ImageID("I_ARROW"), 90.0f},
+		{ "Arrow down", ImageID("I_ARROW"), 270.0f},
+		{ "Arrow left", ImageID("I_ARROW"), 0.0f},
+		{ "Arrow right", ImageID("I_ARROW"), 180.0f},
+		{ "Gear", ImageID("I_GEAR"), 0.0f},
+	};
 
-static const ImageID comboKeyShape[][2] = {
-	{ ImageID("I_ROUND"), ImageID("I_ROUND_LINE") },
-	{ ImageID("I_RECT"), ImageID("I_RECT_LINE") },
-	{ ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE") },
-	{ ImageID("I_DIR"), ImageID("I_DIR_LINE") },
+	// Shape list
+	struct keyShape {
+		const char* n; // UI name
+		ImageID i; // ImageID
+		ImageID l; // ImageID line version
+		float r; // Rotation angle in dregree
+		bool f; // Flip Horizontally
+	};
+	static const keyShape comboKeyShapes[] = {
+		{ "Circle", ImageID("I_ROUND"), ImageID("I_ROUND_LINE"), 0.0f, false },
+		{ "Rectangle", ImageID("I_RECT"), ImageID("I_RECT_LINE"), 0.0f, false },
+		{ "Vertical Rectangle", ImageID("I_RECT"), ImageID("I_RECT_LINE"), 90.0f, false },
+		{ "L button", ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE"), 0.0f, false },
+		{ "R button", ImageID("I_SHOULDER"), ImageID("I_SHOULDER_LINE"), 0.0f, true },
+		{ "Arrow up", ImageID("I_DIR"), ImageID("I_DIR_LINE"), 270.0f, false },
+		{ "Arrow down", ImageID("I_DIR"), ImageID("I_DIR_LINE"), 90.0f, false },
+		{ "Arrow left", ImageID("I_DIR"), ImageID("I_DIR_LINE"), 180.0f, false },
+		{ "Arrow right", ImageID("I_DIR"), ImageID("I_DIR_LINE"), 0.0f, false },
+	};
+
+	// Button list
+	struct keyList {
+		const char* n; // UI name
+		ImageID i; // UI ImageID
+		uint32_t c; // Key code
+	};
+	static const keyList comboKeyList[] = {
+		{ "Square", ImageID("I_SQUARE"), CTRL_SQUARE },
+		{ "Triangle", ImageID("I_TRIANGLE"), CTRL_TRIANGLE },
+		{ "Circle", ImageID("I_CIRCLE"), CTRL_CIRCLE },
+		{ "Cross", ImageID("I_CROSS"), CTRL_CROSS },
+		{ "Up", ImageID::invalid(), CTRL_UP },
+		{ "Down", ImageID::invalid(), CTRL_DOWN },
+		{ "Left", ImageID::invalid(), CTRL_LEFT },
+		{ "Right", ImageID::invalid(), CTRL_RIGHT },
+		{ "Start", ImageID("I_START"), CTRL_START },
+		{ "Select", ImageID("I_SELECT"), CTRL_SELECT },
+		{ "L", ImageID("I_L"), CTRL_LTRIGGER },
+		{ "R", ImageID("I_R"), CTRL_RTRIGGER },
+		{ "Rapid Fire", ImageID::invalid(), VIRTKEY_RAPID_FIRE },
+		{ "Unthrottle", ImageID::invalid(), VIRTKEY_UNTHROTTLE },
+		{ "Speed Toggle", ImageID::invalid(), VIRTKEY_SPEED_TOGGLE },
+		{ "Rewind", ImageID::invalid(), VIRTKEY_REWIND },
+		{ "Save State", ImageID::invalid(), VIRTKEY_SAVE_STATE },
+		{ "Load State", ImageID::invalid(), VIRTKEY_LOAD_STATE },
+		{ "Next Slot", ImageID::invalid(), VIRTKEY_NEXT_SLOT },
+		{ "Toggle Fullscreen", ImageID::invalid(), VIRTKEY_TOGGLE_FULLSCREEN },
+		{ "Speed Custom 1", ImageID::invalid(), VIRTKEY_SPEED_CUSTOM1 },
+		{ "Speed Custom 2", ImageID::invalid(), VIRTKEY_SPEED_CUSTOM2 },
+		{ "Texture Dump", ImageID::invalid(), VIRTKEY_TEXTURE_DUMP },
+		{ "Texture Replace", ImageID::invalid(), VIRTKEY_TEXTURE_REPLACE },
+		{ "Screenshot", ImageID::invalid(), VIRTKEY_SCREENSHOT },
+		{ "Toggle Mute", ImageID::invalid(), VIRTKEY_MUTE_TOGGLE },
+		{ "Open Chat", ImageID::invalid(), VIRTKEY_OPENCHAT },
+		{ "Analog CW", ImageID::invalid(), VIRTKEY_ANALOG_ROTATE_CW },
+		{ "Analog CCW", ImageID::invalid(), VIRTKEY_ANALOG_ROTATE_CCW },		
+	};
+	static_assert(ARRAY_SIZE(comboKeyList) <= 64);
 };

@@ -92,6 +92,7 @@ void TouchControlVisibilityScreen::CreateViews() {
 		screenManager()->push(new RightAnalogMappingScreen());
 		return UI::EVENT_DONE;
 	}});
+	toggles_.push_back({ "Unthrottle", &g_Config.touchUnthrottleKey.show, ImageID::invalid(), nullptr });
 	toggles_.push_back({ "Custom 1", &g_Config.touchCombo0.show, comboKeyImages[g_Config.CustomKey0.image], [=](EventParams &e) {
 		screenManager()->push(new ComboKeyScreen(0));
 		return UI::EVENT_DONE;
