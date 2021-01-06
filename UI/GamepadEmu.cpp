@@ -30,7 +30,6 @@
 #include "Core/Core.h"
 #include "Core/System.h"
 #include "Core/HLE/sceCtrl.h"
-#include "Core/KeyMap.h"
 #include "UI/GamepadEmu.h"
 
 static uint32_t usedPointerMask = 0;
