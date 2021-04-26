@@ -484,6 +484,8 @@ bool System_GetPropertyBool(SystemProperty prop) {
 		} else {
 			return false;
 		}
+	case SYSPROP_HAS_KEYBOARD:
+		return true;
 	default:
 		return false;
 	}
