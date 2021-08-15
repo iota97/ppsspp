@@ -47,7 +47,7 @@ protected:
 
 private:
 	UI::LinearLayout *AddTab(const char *tag, const std::string &title, bool isSearch = false);
-	void ApplySearchFilter();
+	void ApplySearchFilter(bool onViewCreation);
 	void TriggerRestart(const char *why);
 
 	std::string gameID_;
@@ -60,6 +60,7 @@ private:
 	UI::PopupMultiChoice *resolutionChoice_;
 	UI::CheckBox *frameSkipAuto_;
 	SettingInfoMessage *settingInfo_;
+	UI::LinearLayout *searchSettings_;
 	UI::Choice *clearSearchChoice_;
 	UI::TextView *noSearchResults_;
 #ifdef _WIN32
@@ -74,6 +75,7 @@ private:
 
 	UI::TabHolder *tabHolder_;
 	std::vector<UI::LinearLayout *> settingTabContents_;
+	std::vector<std::string> settingTabNames_;
 	std::vector<UI::TextView *> settingTabFilterNotices_;
 
 	// Event handlers
@@ -87,6 +89,7 @@ private:
 	// Global settings handlers
 	UI::EventReturn OnLanguage(UI::EventParams &e);
 	UI::EventReturn OnLanguageChange(UI::EventParams &e);
+	UI::EventReturn OnTabChange(UI::EventParams &e);
 	UI::EventReturn OnAutoFrameskip(UI::EventParams &e);
 	UI::EventReturn OnPostProcShaderChange(UI::EventParams &e);
 	UI::EventReturn OnTextureShader(UI::EventParams &e);
@@ -141,7 +144,8 @@ private:
 	bool enableReports_;
 	bool tessHWEnable_;
 	std::string shaderNames_[256];
-	std::string searchFilter_;
+	std::string searchFilter_ = "";
+	std::string searchFilterBackup_ = "";
 
 	//edit the game-specific settings and restore the global settings after exiting
 	bool editThenRestore_;

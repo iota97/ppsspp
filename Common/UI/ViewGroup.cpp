@@ -66,6 +66,13 @@ void ViewGroup::Clear() {
 	views_.clear();
 }
 
+View *ViewGroup::TranslantViewByIndex(int index) {	
+	std::lock_guard<std::mutex> guard(modifyLock_);
+	View *v = views_[index];
+	views_.erase(views_.begin()+index);
+	return v; 
+}
+
 void ViewGroup::PersistData(PersistStatus status, std::string anonId, PersistMap &storage) {
 	std::lock_guard<std::mutex> guard(modifyLock_);
 
@@ -1296,7 +1303,9 @@ EventReturn TabHolder::OnTabClick(EventParams &e) {
 	// In that case, we make the view gone and then visible - this scrolls scrollviews to the top.
 	if (e.b != 0) {
 		SetCurrentTab((int)e.a);
+		return OnTab.Dispatch(e);
 	}
+
 	return EVENT_DONE;
 }
 

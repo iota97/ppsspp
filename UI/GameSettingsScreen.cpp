@@ -87,6 +87,8 @@ extern AndroidAudioState *g_audioState;
 
 #endif
 
+static int searchTabIndex = -1;
+
 GameSettingsScreen::GameSettingsScreen(const Path &gamePath, std::string gameID, bool editThenRestore)
 	: UIDialogScreenWithGameBackground(gamePath), gameID_(gameID), enableReports_(false), editThenRestore_(editThenRestore) {
 	lastVertical_ = UseVerticalLayout();
@@ -207,6 +209,7 @@ void GameSettingsScreen::CreateViews() {
 		root_->Add(tabHolder_);
 		AddStandardBack(root_);
 	}
+	tabHolder_->OnTab.Handle(this, &GameSettingsScreen::OnTabChange);
 	tabHolder_->SetTag("GameSettings");
 	root_->SetDefaultFocusView(tabHolder_);
 	settingTabContents_.clear();
@@ -992,18 +995,22 @@ void GameSettingsScreen::CreateViews() {
 	static const char *buttonPref[] = { "Use O to confirm", "Use X to confirm" };
 	systemSettings->Add(new PopupMultiChoice(&g_Config.iButtonPreference, sy->T("Confirmation Button"), buttonPref, 0, 2, sy->GetName(), screenManager()));
 
+#if !PPSSPP_PLATFORM(IOS)
+	// Search
+	searchSettings_ = AddTab("GameSettingsSearch", ms->T("Search"), true);
+	searchSettings_->Add(new ItemHeader(se->T("Find settings")));
+
 	if (System_GetPropertyBool(SYSPROP_HAS_KEYBOARD)) {
-		// Search
-		LinearLayout *searchSettings = AddTab("GameSettingsSearch", ms->T("Search"), true);
-
-		searchSettings->Add(new ItemHeader(se->T("Find settings")));
-		searchSettings->Add(new ChoiceWithValueDisplay(&searchFilter_, se->T("Filter"), (const char *)nullptr))->OnClick.Handle(this, &GameSettingsScreen::OnChangeSearchFilter);
-		clearSearchChoice_ = searchSettings->Add(new Choice(se->T("Clear filter")));
-		clearSearchChoice_->OnClick.Handle(this, &GameSettingsScreen::OnClearSearchFilter);
-		noSearchResults_ = searchSettings->Add(new TextView(se->T("No settings matched '%1'"), new LinearLayoutParams(Margins(20, 5))));
-
-		ApplySearchFilter();
+		searchSettings_->Add(new ChoiceWithValueDisplay(&searchFilter_, se->T("Filter"), (const char *)nullptr))->OnClick.Handle(this, &GameSettingsScreen::OnChangeSearchFilter);
+	} else {
+		searchSettings_->Add(new PopupTextInputChoice(&searchFilter_, se->T("Filter"), "", 128, screenManager()))->OnChange.Handle(this, &GameSettingsScreen::OnChangeSearchFilter);
 	}
+	clearSearchChoice_ = searchSettings_->Add(new Choice(se->T("Clear filter")));
+	clearSearchChoice_->OnClick.Handle(this, &GameSettingsScreen::OnClearSearchFilter);
+	noSearchResults_ = searchSettings_->Add(new TextView(se->T("No settings matched '%1'"), new LinearLayoutParams(Margins(20, 5))));
+
+	ApplySearchFilter(true);
+#endif
 }
 
 UI::LinearLayout *GameSettingsScreen::AddTab(const char *tag, const std::string &title, bool isSearch) {
@@ -1020,11 +1027,17 @@ UI::LinearLayout *GameSettingsScreen::AddTab(const char *tag, const std::string 
 
 	if (!isSearch) {
 		settingTabContents_.push_back(contents);
-
-		auto notice = contents->Add(new TextView(se->T("Filtering settings by '%1'"), new LinearLayoutParams(Margins(20, 5))));
-		settingTabFilterNotices_.push_back(notice);
+		settingTabNames_.push_back(title);
 	}
 
+	static int addedTab = 0;
+	if (searchTabIndex == -1) {
+		if (isSearch) {
+			searchTabIndex = addedTab;
+		} else {
+			addedTab++;
+		}
+	}
 	return contents;
 }
 
@@ -1272,45 +1285,58 @@ void GameSettingsScreen::sendMessage(const char *message, const char *value) {
 		searchFilter_.resize(filter.size());
 		std::transform(filter.begin(), filter.end(), searchFilter_.begin(), tolower);
 
-		ApplySearchFilter();
+		ApplySearchFilter(false);
 	}
 }
 
-void GameSettingsScreen::ApplySearchFilter() {
+void GameSettingsScreen::ApplySearchFilter(bool onViewCreation) {
+	if (!onViewCreation)
+		RecreateViews(); // Make sure all is there
+
 	auto se = GetI18NCategory("Search");
 
-	bool matches = searchFilter_.empty();
-	for (int t = 0; t < (int)settingTabContents_.size(); ++t) {
-		auto tabContents = settingTabContents_[t];
-		bool tabMatches = searchFilter_.empty();
+	bool matches = searchFilter_ == "";
+	if (searchFilter_ != "") {
+		for (int t = 0; t < (int)settingTabContents_.size(); ++t) {
+			UI::ItemHeader *tabName = searchSettings_->Add(new UI::ItemHeader(settingTabNames_[t], nullptr, true));
+			auto tabContents = settingTabContents_[t];
 
-		// Show an indicator that a filter is applied.
-		settingTabFilterNotices_[t]->SetVisibility(tabMatches ? UI::V_GONE : UI::V_VISIBLE);
-		settingTabFilterNotices_[t]->SetText(ReplaceAll(se->T("Filtering settings by '%1'"), "%1", searchFilter_));
+			UI::View *lastHeading = nullptr;
+			UI::View *lastAddedHeading = nullptr;
+			int lastHeadingIndex = 0;
+			bool tabMatch = false;
+			for (int i = 0; i < tabContents->GetNumSubviews(); ++i) {
+				UI::View *v = tabContents->GetViewByIndex(i);
+				if (!v->CanBeFocused()) {
+					lastHeading = v;
+					lastHeadingIndex = i;
+				}
 
-		UI::View *lastHeading = nullptr;
-		for (int i = 1; i < tabContents->GetNumSubviews(); ++i) {
-			UI::View *v = tabContents->GetViewByIndex(i);
-			if (!v->CanBeFocused()) {
-				lastHeading = v;
+				std::string label = v->DescribeText();
+				std::transform(label.begin(), label.end(), label.begin(), tolower);
+				bool match = v->CanBeFocused() && label.find(searchFilter_) != label.npos;
+
+				if (match) {
+					if (lastHeading != lastAddedHeading) {
+						searchSettings_->Add(tabContents->TranslantViewByIndex(lastHeadingIndex));
+						lastAddedHeading = lastHeading;
+						i--;
+					}
+					searchSettings_->Add(tabContents->TranslantViewByIndex(i--));
+					matches = true;
+					tabMatch = true;
+				}
 			}
-
-			std::string label = v->DescribeText();
-			std::transform(label.begin(), label.end(), label.begin(), tolower);
-			bool match = v->CanBeFocused() && label.find(searchFilter_) != label.npos;
-			tabMatches = tabMatches || match;
-
-			if (match && lastHeading)
-				lastHeading->SetVisibility(UI::V_VISIBLE);
-			v->SetVisibility(searchFilter_.empty() || match ? UI::V_VISIBLE : UI::V_GONE);
+			if (!tabMatch)
+				tabName->SetVisibility(UI::V_GONE);
 		}
-		tabHolder_->EnableTab(t, tabMatches);
-		matches = matches || tabMatches;
 	}
-
 	noSearchResults_->SetText(ReplaceAll(se->T("No settings matched '%1'"), "%1", searchFilter_));
 	noSearchResults_->SetVisibility(matches ? UI::V_GONE : UI::V_VISIBLE);
-	clearSearchChoice_->SetVisibility(searchFilter_.empty() ? UI::V_GONE : UI::V_VISIBLE);
+	clearSearchChoice_->SetVisibility(searchFilter_ == "" ? UI::V_GONE : UI::V_VISIBLE);
+
+	if (!onViewCreation)
+		tabHolder_->SetCurrentTab(searchTabIndex);
 }
 
 void GameSettingsScreen::dialogFinished(const Screen *dialog, DialogResult result) {
@@ -1551,6 +1577,27 @@ UI::EventReturn GameSettingsScreen::OnLanguageChange(UI::EventParams &e) {
 	return UI::EVENT_DONE;
 }
 
+UI::EventReturn GameSettingsScreen::OnTabChange(UI::EventParams &e) {
+	static int oldTab = 0;
+	if (tabHolder_->GetCurrentTab() != oldTab) { // Only on actual tab change
+		static bool saved = false;
+		oldTab = tabHolder_->GetCurrentTab();
+		if (e.a != searchTabIndex) {
+			if (!saved) {
+				searchFilterBackup_ = searchFilter_;
+				saved = true;
+			}
+			searchFilter_ = "";
+		} else {
+			searchFilter_ = searchFilterBackup_;
+			saved = false;
+		}
+
+		RecreateViews();
+	}
+	return UI::EVENT_DONE;
+}
+
 UI::EventReturn GameSettingsScreen::OnPostProcShaderChange(UI::EventParams &e) {
 	g_Config.vPostShaderNames.erase(std::remove(g_Config.vPostShaderNames.begin(), g_Config.vPostShaderNames.end(), "Off"), g_Config.vPostShaderNames.end());
 
@@ -1626,12 +1673,18 @@ UI::EventReturn GameSettingsScreen::OnSysInfo(UI::EventParams &e) {
 
 UI::EventReturn GameSettingsScreen::OnChangeSearchFilter(UI::EventParams &e) {
 #if PPSSPP_PLATFORM(WINDOWS) || defined(USING_QT_UI) || defined(__ANDROID__)
-	auto se = GetI18NCategory("Search");
-	System_InputBoxGetString(se->T("Search term"), searchFilter_, [this](bool result, const std::string &value) {
-		if (result) {
-			NativeMessageReceived("gameSettings_search", StripSpaces(value).c_str());
-		}
-	});
+	if (System_GetPropertyBool(SYSPROP_HAS_KEYBOARD)) {
+		auto se = GetI18NCategory("Search");
+		System_InputBoxGetString(se->T("Search term"), searchFilter_, [this](bool result, const std::string &value) {
+			if (result) {
+				NativeMessageReceived("gameSettings_search", StripSpaces(value).c_str());
+			}
+		});
+	} else {
+		NativeMessageReceived("gameSettings_search", StripSpaces(searchFilter_).c_str());
+	}
+#else 
+	NativeMessageReceived("gameSettings_search", StripSpaces(searchFilter_).c_str());
 #endif
 	return UI::EVENT_DONE;
 }

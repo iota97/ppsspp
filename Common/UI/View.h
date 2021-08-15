@@ -744,13 +744,14 @@ private:
 
 class ItemHeader : public Item {
 public:
-	ItemHeader(const std::string &text, LayoutParams *layoutParams = 0);
+	ItemHeader(const std::string &text, LayoutParams *layoutParams = 0, bool centerText = false);
 	void Draw(UIContext &dc) override;
 	std::string DescribeText() const override;
 	void GetContentDimensionsBySpec(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert, float &w, float &h) const override;
 
 private:
 	std::string text_;
+	bool centerText_;
 };
 
 class PopupHeader : public Item {

@@ -563,15 +563,19 @@ std::string InfoItem::DescribeText() const {
 	return ReplaceAll(ReplaceAll(u->T("%1: %2"), "%1", text_), "%2", rightText_);
 }
 
-ItemHeader::ItemHeader(const std::string &text, LayoutParams *layoutParams)
-	: Item(layoutParams), text_(text) {
+ItemHeader::ItemHeader(const std::string &text, LayoutParams *layoutParams, bool centerText)
+	: Item(layoutParams), text_(text), centerText_(centerText) {
 	layoutParams_->width = FILL_PARENT;
 	layoutParams_->height = 40;
 }
 
 void ItemHeader::Draw(UIContext &dc) {
 	dc.SetFontStyle(dc.theme->uiFontSmall);
-	dc.DrawText(text_.c_str(), bounds_.x + 4, bounds_.centerY(), dc.theme->headerStyle.fgColor, ALIGN_LEFT | ALIGN_VCENTER);
+	if (centerText_) {
+		dc.DrawText(text_.c_str(), bounds_.centerX(), bounds_.centerY(), dc.theme->headerStyle.fgColor, ALIGN_CENTER | ALIGN_VCENTER);
+	} else {
+		dc.DrawText(text_.c_str(), bounds_.x + 4, bounds_.centerY(), dc.theme->headerStyle.fgColor, ALIGN_LEFT | ALIGN_VCENTER);
+	}
 	dc.Draw()->DrawImageCenterTexel(dc.theme->whiteImage, bounds_.x, bounds_.y2()-2, bounds_.x2(), bounds_.y2(), dc.theme->headerStyle.fgColor);
 }
 

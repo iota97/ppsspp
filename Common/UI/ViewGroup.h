@@ -72,6 +72,7 @@ public:
 	virtual void Clear();
 	void PersistData(PersistStatus status, std::string anonId, PersistMap &storage) override;
 	View *GetViewByIndex(int index) { return views_[index]; }
+	View *TranslantViewByIndex(int index);
 	int GetNumSubviews() const { return (int)views_.size(); }
 	void SetHasDropShadow(bool has) { hasDropShadow_ = has; }
 	void SetDropShadowExpand(float s) { dropShadowExpand_ = s; }
@@ -344,6 +345,8 @@ public:
 	std::string DescribeLog() const override { return "TabHolder: " + View::DescribeLog(); }
 
 	void PersistData(PersistStatus status, std::string anonId, PersistMap &storage) override;
+
+	Event OnTab;
 
 private:
 	void AddTabContents(const std::string &title, View *tabContents);
