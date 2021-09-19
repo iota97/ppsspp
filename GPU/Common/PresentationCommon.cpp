@@ -666,6 +666,8 @@ void PresentationCommon::CopyToOutput(OutputFlags flags, int uvRotation, float u
 		BindSource(1);
 		if (shaderInfo->usePreviousFrame)
 			draw_->BindFramebufferAsTexture(previousFramebuffer, 2, Draw::FB_COLOR_BIT, 0);
+		if (srcFramebuffer_ && shaderInfo->useDepthBuffer)
+			draw_->BindFramebufferAsTexture(srcFramebuffer_, 3, Draw::FB_DEPTH_BIT, 0);
 
 		int nextWidth, nextHeight;
 		draw_->GetFramebufferDimensions(postShaderFramebuffer, &nextWidth, &nextHeight);
@@ -683,6 +685,8 @@ void PresentationCommon::CopyToOutput(OutputFlags flags, int uvRotation, float u
 		draw_->BindSamplerStates(1, 1, &sampler);
 		if (shaderInfo->usePreviousFrame)
 			draw_->BindSamplerStates(2, 1, &sampler);
+		if (srcFramebuffer_ && shaderInfo->useDepthBuffer)
+			draw_->BindSamplerStates(3, 1, &sampler);
 
 		draw_->BindVertexBuffers(0, 1, &vdata_, &postVertsOffset);
 		draw_->BindIndexBuffer(idata_, 0);

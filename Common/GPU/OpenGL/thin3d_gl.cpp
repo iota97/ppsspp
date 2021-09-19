@@ -1168,6 +1168,7 @@ bool OpenGLPipeline::LinkShaders() {
 	queries.push_back({ &samplerLocs_[0], "sampler0" });
 	queries.push_back({ &samplerLocs_[1], "sampler1" });
 	queries.push_back({ &samplerLocs_[2], "sampler2" });
+	queries.push_back({ &samplerLocs_[3], "sampler3" });
 	_assert_(queries.size() >= MAX_TEXTURE_SLOTS);
 	for (size_t i = 0; i < dynamicUniforms.uniforms.size(); ++i) {
 		queries.push_back({ &dynamicUniformLocs_[i], dynamicUniforms.uniforms[i].name });
