@@ -312,6 +312,15 @@ public:
 	bool bGridView2;
 	bool bGridView3;
 
+	// Left analog binding
+	int iLeftAnalogUp;
+	int iLeftAnalogDown;
+	int iLeftAnalogLeft;
+	int iLeftAnalogRight;
+	int iLeftAnalogPress;
+	bool bLeftAnalogCustom;
+	bool bLeftAnalogDisableDiagonal;
+
 	// Right analog binding
 	int iRightAnalogUp;
 	int iRightAnalogDown;

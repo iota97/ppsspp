@@ -466,8 +466,8 @@ void PSPStick::ProcessTouch(float x, float y, bool down) {
 	}
 }
 
-PSPCustomStick::PSPCustomStick(ImageID bgImg, const char *key, ImageID stickImg, ImageID stickDownImg, float scale, UI::LayoutParams *layoutParams)
-	: PSPStick(bgImg, key, stickImg, stickDownImg, -1, scale, layoutParams) {
+PSPCustomStick::PSPCustomStick(ImageID bgImg, const char *key, ImageID stickImg, ImageID stickDownImg, int stick, float scale, UI::LayoutParams *layoutParams)
+	: PSPStick(bgImg, key, stickImg, stickDownImg, stick, scale, layoutParams) {
 }
 
 void PSPCustomStick::Draw(UIContext &dc) {
@@ -496,8 +496,9 @@ void PSPCustomStick::Draw(UIContext &dc) {
 
 	if (!g_Config.bHideStickBackground)
 		dc.Draw()->DrawImage(bgImg_, stickX, stickY, 1.0f * scale_, colorBg, ALIGN_CENTER);
+	float headScale = stick_ ? g_Config.fRightStickHeadScale : g_Config.fLeftStickHeadScale;
 	if (dragPointerId_ != -1 && g_Config.iTouchButtonStyle == 2 && stickDownImg_ != stickImageIndex_)
-		dc.Draw()->DrawImage(stickDownImg_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f*scale_*g_Config.fRightStickHeadScale, downBg, ALIGN_CENTER);
+		dc.Draw()->DrawImage(stickDownImg_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f * scale_ * headScale, downBg, ALIGN_CENTER);
 	dc.Draw()->DrawImage(stickImageIndex_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f*scale_*g_Config.fRightStickHeadScale, colorBg, ALIGN_CENTER);
 }
 
@@ -549,6 +550,13 @@ void PSPCustomStick::Touch(const TouchInput &input) {
 void PSPCustomStick::ProcessTouch(float x, float y, bool down) {
 	static const int button[16] = {CTRL_LTRIGGER, CTRL_RTRIGGER, CTRL_SQUARE, CTRL_TRIANGLE, CTRL_CIRCLE, CTRL_CROSS, CTRL_UP, CTRL_DOWN, CTRL_LEFT, CTRL_RIGHT, CTRL_START, CTRL_SELECT};
 
+	int u = stick_ ? g_Config.iRightAnalogUp : g_Config.iLeftAnalogUp;
+	int d = stick_ ? g_Config.iRightAnalogDown : g_Config.iLeftAnalogDown;
+	int l = stick_ ? g_Config.iRightAnalogLeft : g_Config.iLeftAnalogLeft;
+	int r = stick_ ? g_Config.iRightAnalogRight : g_Config.iLeftAnalogRight;
+	int p = stick_ ? g_Config.iRightAnalogPress : g_Config.iLeftAnalogPress;
+	bool dd = stick_ ? g_Config.bRightAnalogDisableDiagonal : g_Config.bLeftAnalogDisableDiagonal;
+
 	if (down && centerX_ >= 0.0f) {
 		float inv_stick_size = 1.0f / (stick_size_ * scale_);
 
@@ -558,47 +566,47 @@ void PSPCustomStick::ProcessTouch(float x, float y, bool down) {
 		dx = std::min(1.0f, std::max(-1.0f, dx));
 		dy = std::min(1.0f, std::max(-1.0f, dy));
 
-		if (g_Config.iRightAnalogRight != 0) {
-			if (dx > 0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) > fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogRight-1]);
+		if (r != 0) {
+			if (dx > 0.5f && (!dd || fabs(dx) > fabs(dy)))
+				__CtrlButtonDown(button[r-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogRight-1]);
+				__CtrlButtonUp(button[r-1]);
 		}
-		if (g_Config.iRightAnalogLeft != 0) {
-			if (dx < -0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) > fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogLeft-1]);
+		if (l != 0) {
+			if (dx < -0.5f && (!dd || fabs(dx) > fabs(dy)))
+				__CtrlButtonDown(button[l-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogLeft-1]);
+				__CtrlButtonUp(button[l-1]);
 		}
-		if (g_Config.iRightAnalogUp != 0) {
-			if (dy < -0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) <= fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogUp-1]);
+		if (u != 0) {
+			if (dy < -0.5f && (!dd || fabs(dx) <= fabs(dy)))
+				__CtrlButtonDown(button[u-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogUp-1]);
+				__CtrlButtonUp(button[u-1]);
 		}
-		if (g_Config.iRightAnalogDown != 0) {
-			if (dy > 0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) <= fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogDown-1]);
+		if (d != 0) {
+			if (dy > 0.5f && (!dd || fabs(dx) <= fabs(dy)))
+				__CtrlButtonDown(button[d-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogDown-1]);
+				__CtrlButtonUp(button[d-1]);
 		}
-		if (g_Config.iRightAnalogPress != 0)
-			__CtrlButtonDown(button[g_Config.iRightAnalogPress-1]);
+		if (p != 0)
+			__CtrlButtonDown(button[p-1]);
 
 		posX_ = dx;
 		posY_ = dy;
 
 	} else {
-		if (g_Config.iRightAnalogUp != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogUp-1]);
-		if (g_Config.iRightAnalogDown != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogDown-1]);
-		if (g_Config.iRightAnalogLeft != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogLeft-1]);
-		if (g_Config.iRightAnalogRight != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogRight-1]);
-		if (g_Config.iRightAnalogPress != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogPress-1]);
+		if (u != 0)
+			__CtrlButtonUp(button[u-1]);
+		if (d != 0)
+			__CtrlButtonUp(button[d-1]);
+		if (l != 0)
+			__CtrlButtonUp(button[l-1]);
+		if (r != 0)
+			__CtrlButtonUp(button[r-1]);
+		if (p != 0)
+			__CtrlButtonUp(button[p-1]);
 
 		posX_ = 0.0f;
 		posY_ = 0.0f;
@@ -822,12 +830,16 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, bool showPau
 	if (g_Config.touchDpad.show)
 		root->Add(new PSPDpad(dirImage, "D-pad", ImageID("I_DIR"), ImageID("I_ARROW"), g_Config.touchDpad.scale, g_Config.fDpadSpacing, buttonLayoutParams(g_Config.touchDpad)));
 
-	if (g_Config.touchAnalogStick.show)
-		root->Add(new PSPStick(stickBg, "Left analog stick", stickImage, ImageID("I_STICK"), 0, g_Config.touchAnalogStick.scale, buttonLayoutParams(g_Config.touchAnalogStick)));
+	if (g_Config.touchAnalogStick.show) {
+		if (g_Config.bLeftAnalogCustom)
+			root->Add(new PSPCustomStick(stickBg, "Left analog stick", stickImage, ImageID("I_STICK"), 0, g_Config.touchAnalogStick.scale, buttonLayoutParams(g_Config.touchAnalogStick)));
+		else
+			root->Add(new PSPStick(stickBg, "Left analog stick", stickImage, ImageID("I_STICK"), 0, g_Config.touchAnalogStick.scale, buttonLayoutParams(g_Config.touchAnalogStick)));
+	}
 
 	if (g_Config.touchRightAnalogStick.show) {
 		if (g_Config.bRightAnalogCustom)
-			root->Add(new PSPCustomStick(stickBg, "Right analog stick", stickImage, ImageID("I_STICK"), g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
+			root->Add(new PSPCustomStick(stickBg, "Right analog stick", stickImage, ImageID("I_STICK"), 1, g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
 		else
 			root->Add(new PSPStick(stickBg, "Right analog stick", stickImage, ImageID("I_STICK"), 1, g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
 	}

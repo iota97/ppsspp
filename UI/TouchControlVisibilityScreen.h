@@ -48,3 +48,8 @@ class RightAnalogMappingScreen : public UIDialogScreenWithBackground {
 public:
 	void CreateViews() override;
 };
+
+class LeftAnalogMappingScreen : public UIDialogScreenWithBackground {
+public:
+	void CreateViews() override;
+};

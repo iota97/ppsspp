@@ -544,6 +544,15 @@ static ConfigSetting generalSettings[] = {
 	ConfigSetting("GridView1", &g_Config.bGridView1, true),
 	ConfigSetting("GridView2", &g_Config.bGridView2, true),
 	ConfigSetting("GridView3", &g_Config.bGridView3, false),
+
+	ConfigSetting("LeftAnalogUp", &g_Config.iLeftAnalogUp, 0, true, true),
+	ConfigSetting("LeftAnalogDown", &g_Config.iLeftAnalogDown, 0, true, true),
+	ConfigSetting("LeftAnalogLeft", &g_Config.iLeftAnalogLeft, 0, true, true),
+	ConfigSetting("LeftAnalogRight", &g_Config.iLeftAnalogRight, 0, true, true),
+	ConfigSetting("LeftAnalogPress", &g_Config.iLeftAnalogPress, 0, true, true),
+	ConfigSetting("LeftAnalogCustom", &g_Config.bLeftAnalogCustom, false, true, true),
+	ConfigSetting("LeftAnalogDisableDiagonal", &g_Config.bLeftAnalogDisableDiagonal, false, true, true),
+
 	ConfigSetting("RightAnalogUp", &g_Config.iRightAnalogUp, 0, true, true),
 	ConfigSetting("RightAnalogDown", &g_Config.iRightAnalogDown, 0, true, true),
 	ConfigSetting("RightAnalogLeft", &g_Config.iRightAnalogLeft, 0, true, true),
@@ -551,6 +560,7 @@ static ConfigSetting generalSettings[] = {
 	ConfigSetting("RightAnalogPress", &g_Config.iRightAnalogPress, 0, true, true),
 	ConfigSetting("RightAnalogCustom", &g_Config.bRightAnalogCustom, false, true, true),
 	ConfigSetting("RightAnalogDisableDiagonal", &g_Config.bRightAnalogDisableDiagonal, false, true, true),
+
 	ConfigSetting("SwipeUp", &g_Config.iSwipeUp, 0, true, true),
 	ConfigSetting("SwipeDown", &g_Config.iSwipeDown, 0, true, true),
 	ConfigSetting("SwipeLeft", &g_Config.iSwipeLeft, 0, true, true),

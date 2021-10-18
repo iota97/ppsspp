@@ -82,7 +82,10 @@ void TouchControlVisibilityScreen::CreateViews() {
 	toggles_.push_back({ "Start", &g_Config.touchStartKey.show, ImageID("I_START"), nullptr });
 	toggles_.push_back({ "Select", &g_Config.touchSelectKey.show, ImageID("I_SELECT"), nullptr });
 	toggles_.push_back({ "Dpad", &g_Config.touchDpad.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "Analog Stick", &g_Config.touchAnalogStick.show, ImageID::invalid(), nullptr });
+	toggles_.push_back({ "Analog Stick", &g_Config.touchAnalogStick.show, ImageID::invalid(), [=](EventParams &e) {
+		screenManager()->push(new LeftAnalogMappingScreen());
+		return UI::EVENT_DONE;
+	}});
 	toggles_.push_back({ "Right Analog Stick", &g_Config.touchRightAnalogStick.show, ImageID::invalid(), [=](EventParams &e) {
 		screenManager()->push(new RightAnalogMappingScreen());
 		return UI::EVENT_DONE;
@@ -190,6 +193,44 @@ void RightAnalogMappingScreen::CreateViews() {
 	rightAnalogLeft->SetEnabledPtr(&g_Config.bRightAnalogCustom);
 	rightAnalogRight->SetEnabledPtr(&g_Config.bRightAnalogCustom);
 	rightAnalogPress->SetEnabledPtr(&g_Config.bRightAnalogCustom);
+}
+
+void LeftAnalogMappingScreen::CreateViews() {
+	// TODO: Remove this ugly copy paste
+	using namespace UI;
+
+	auto di = GetI18NCategory("Dialog");
+	auto co = GetI18NCategory("Controls");
+	auto mc = GetI18NCategory("MappableControls");
+
+	root_ = new AnchorLayout(new LayoutParams(FILL_PARENT, FILL_PARENT));
+	Choice *back = new Choice(di->T("Back"), "", false, new AnchorLayoutParams(leftColumnWidth - 10, WRAP_CONTENT, 10, NONE, NONE, 10));
+	root_->Add(back)->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
+	TabHolder *tabHolder = new TabHolder(ORIENT_VERTICAL, leftColumnWidth, new AnchorLayoutParams(10, 0, 10, 0, false));
+	root_->Add(tabHolder);
+	ScrollView *rightPanel = new ScrollView(ORIENT_VERTICAL);
+	tabHolder->AddTab(co->T("Binds"), rightPanel);
+	LinearLayout *vert = rightPanel->Add(new LinearLayout(ORIENT_VERTICAL, new LayoutParams(FILL_PARENT, FILL_PARENT)));
+	vert->SetSpacing(0);
+
+	static const char *rightAnalogButton[] = {"None", "L", "R", "Square", "Triangle", "Circle", "Cross", "D-pad up", "D-pad down", "D-pad left", "D-pad right", "Start", "Select"};
+	
+	vert->Add(new ItemHeader(co->T("Analog Style")));
+	vert->Add(new CheckBox(&g_Config.touchAnalogStick.show, co->T("Visible")));
+	vert->Add(new CheckBox(&g_Config.bLeftAnalogCustom, co->T("Use custom left analog")));
+	vert->Add(new CheckBox(&g_Config.bLeftAnalogDisableDiagonal, co->T("Disable diagonal input")))->SetEnabledPtr(&g_Config.bLeftAnalogCustom);
+
+	vert->Add(new ItemHeader(co->T("Analog Binding")));
+	PopupMultiChoice *rightAnalogUp = vert->Add(new PopupMultiChoice(&g_Config.iLeftAnalogUp, mc->T("An.Up"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
+	PopupMultiChoice *rightAnalogDown = vert->Add(new PopupMultiChoice(&g_Config.iLeftAnalogDown, mc->T("An.Down"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
+	PopupMultiChoice *rightAnalogLeft = vert->Add(new PopupMultiChoice(&g_Config.iLeftAnalogLeft, mc->T("An.Left"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
+	PopupMultiChoice *rightAnalogRight = vert->Add(new PopupMultiChoice(&g_Config.iLeftAnalogRight, mc->T("An.Right"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
+	PopupMultiChoice *rightAnalogPress = vert->Add(new PopupMultiChoice(&g_Config.iLeftAnalogPress, co->T("Keep this button pressed when left analog is pressed"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
+	rightAnalogUp->SetEnabledPtr(&g_Config.bLeftAnalogCustom);
+	rightAnalogDown->SetEnabledPtr(&g_Config.bLeftAnalogCustom);
+	rightAnalogLeft->SetEnabledPtr(&g_Config.bLeftAnalogCustom);
+	rightAnalogRight->SetEnabledPtr(&g_Config.bLeftAnalogCustom);
+	rightAnalogPress->SetEnabledPtr(&g_Config.bLeftAnalogCustom);
 }
 
 UI::EventReturn TouchControlVisibilityScreen::OnToggleAll(UI::EventParams &e) {
