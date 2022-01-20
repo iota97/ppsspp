@@ -91,6 +91,48 @@ protected:
 	float &x_, &y_;
 };
 
+class DragDropCustomStick : public DragDropButton {
+public:
+	DragDropCustomStick(ConfigTouchPos &pos, const char *key, ImageID numImg, ImageID bgImg, ImageID img, const Bounds &screenBounds) :
+		DragDropButton(pos, key, bgImg, img, screenBounds), numImg_(numImg) {}
+	void Draw(UIContext &dc) override {
+		float opacity = GetButtonOpacity();
+		if (opacity <= 0.0f)
+			return;
+
+		float scale = scale_;
+		if (IsDown()) {
+			if (g_Config.iTouchButtonStyle == 2) {
+				opacity *= 1.35f;
+			} else {
+				scale *= 2.0f;
+				opacity *= 1.15f;
+			}
+		}
+
+		uint32_t colorBg = colorAlpha(GetButtonColor(), opacity);
+		uint32_t downBg = colorAlpha(0xFFFFFF, opacity * 0.5f);
+		uint32_t color = colorAlpha(0xFFFFFF, opacity);
+
+		if (IsDown() && g_Config.iTouchButtonStyle == 2) {
+			if (bgImg_ != bgDownImg_)
+				dc.Draw()->DrawImageRotated(bgDownImg_, bounds_.centerX(), bounds_.centerY(), scale, bgAngle_ * (M_PI * 2 / 360.0f), downBg, flipImageH_);
+		}
+
+		dc.Draw()->DrawImageRotated(bgImg_, bounds_.centerX(), bounds_.centerY(), scale, bgAngle_ * (M_PI * 2 / 360.0f), colorBg, flipImageH_);
+
+		int y = bounds_.centerY();
+		// Hack round the fact that the center of the rectangular picture the triangle is contained in
+		// is not at the "weight center" of the triangle.
+		if (img_ == ImageID("I_TRIANGLE"))
+			y -= 2.8f * scale;
+		dc.Draw()->DrawImageRotated(img_, bounds_.centerX(), y, scale, angle_ * (M_PI * 2 / 360.0f), color);
+		dc.Draw()->DrawImage(numImg_, bounds_.centerX(), bounds_.centerY(), scale_, colorBg, ALIGN_CENTER);
+	}
+private:
+	ImageID numImg_;
+};
+
 class PSPActionButtons : public DragDropButton {
 public:
 	PSPActionButtons(ConfigTouchPos &pos, const char *key, float &spacing, const Bounds &screenBounds)
@@ -504,6 +546,20 @@ void ControlLayoutView::CreateViews() {
 	if (g_Config.touchRightAnalogStick.show) {
 		controls_.push_back(new PSPStickDragDrop(g_Config.touchRightAnalogStick, "Right analog stick", stickBg, stickImage, bounds, g_Config.fRightStickHeadScale));
 	}
+
+	auto addDragDropCustomStick = [&](ConfigTouchPos &pos, const char *key, ImageID numImg, ImageID bgImg, ImageID img) {
+		DragDropCustomStick *b = nullptr;
+		if (pos.show) {
+			b = new DragDropCustomStick(pos, key, numImg, bgImg, img, bounds);
+			controls_.push_back(b);
+		}
+		return b;
+	};
+	
+	addDragDropCustomStick(g_Config.touchCustomAnalog1, "Custom analog stick 1", ImageID("I_1"), stickBg, stickImage);
+	addDragDropCustomStick(g_Config.touchCustomAnalog2, "Custom analog stick 2", ImageID("I_2"), stickBg, stickImage);
+	addDragDropCustomStick(g_Config.touchCustomAnalog3, "Custom analog stick 3", ImageID("I_3"), stickBg, stickImage);
+	addDragDropCustomStick(g_Config.touchCustomAnalog4, "Custom analog stick 4", ImageID("I_4"), stickBg, stickImage);
 
 	auto addDragComboKey = [&](ConfigTouchPos &pos, const char *key, const ConfigCustomButton& cfg) {
 		DragDropButton *b = nullptr;

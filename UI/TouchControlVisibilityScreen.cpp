@@ -83,8 +83,25 @@ void TouchControlVisibilityScreen::CreateViews() {
 	toggles_.push_back({ "Select", &g_Config.touchSelectKey.show, ImageID("I_SELECT"), nullptr });
 	toggles_.push_back({ "Dpad", &g_Config.touchDpad.show, ImageID::invalid(), nullptr });
 	toggles_.push_back({ "Analog Stick", &g_Config.touchAnalogStick.show, ImageID::invalid(), nullptr });
-	toggles_.push_back({ "Right Analog Stick", &g_Config.touchRightAnalogStick.show, ImageID::invalid(), [=](EventParams &e) {
-		screenManager()->push(new RightAnalogMappingScreen());
+	toggles_.push_back({ "Right Analog Stick", &g_Config.touchRightAnalogStick.show, ImageID::invalid(), nullptr });
+	toggles_.push_back({ "Custom Analog Stick 1", &g_Config.touchCustomAnalog1.show, ImageID::invalid(), [=](EventParams &e) {
+		screenManager()->push(new CustomAnalogMappingScreen(&g_Config.touchCustomAnalog1.show, 
+			&g_Config.iAnalogUp1, &g_Config.iAnalogDown1, &g_Config.iAnalogLeft1, &g_Config.iAnalogRight1, &g_Config.iAnalogPress1, &g_Config.bAnalogDiag1));
+		return UI::EVENT_DONE;
+	}});
+	toggles_.push_back({ "Custom Analog Stick 2", &g_Config.touchCustomAnalog2.show, ImageID::invalid(), [=](EventParams &e) {
+		screenManager()->push(new CustomAnalogMappingScreen(&g_Config.touchCustomAnalog2.show, 
+			&g_Config.iAnalogUp2, &g_Config.iAnalogDown2, &g_Config.iAnalogLeft2, &g_Config.iAnalogRight2, &g_Config.iAnalogPress2, &g_Config.bAnalogDiag2));
+		return UI::EVENT_DONE;
+	}});
+	toggles_.push_back({ "Custom Analog Stick 3", &g_Config.touchCustomAnalog3.show, ImageID::invalid(), [=](EventParams &e) {
+		screenManager()->push(new CustomAnalogMappingScreen(&g_Config.touchCustomAnalog3.show, 
+			&g_Config.iAnalogUp3, &g_Config.iAnalogDown3, &g_Config.iAnalogLeft3, &g_Config.iAnalogRight3, &g_Config.iAnalogPress3, &g_Config.bAnalogDiag3));
+		return UI::EVENT_DONE;
+	}});
+	toggles_.push_back({ "Custom Analog Stick 4", &g_Config.touchCustomAnalog4.show, ImageID::invalid(), [=](EventParams &e) {
+		screenManager()->push(new CustomAnalogMappingScreen(&g_Config.touchCustomAnalog4.show, 
+			&g_Config.iAnalogUp4, &g_Config.iAnalogDown4, &g_Config.iAnalogLeft4, &g_Config.iAnalogRight4, &g_Config.iAnalogPress4, &g_Config.bAnalogDiag4));
 		return UI::EVENT_DONE;
 	}});
 	toggles_.push_back({ "Fast-forward", &g_Config.touchFastForwardKey.show, ImageID::invalid(), nullptr });
@@ -155,7 +172,7 @@ void TouchControlVisibilityScreen::onFinish(DialogResult result) {
 	g_Config.Save("TouchControlVisibilityScreen::onFinish");
 }
 
-void RightAnalogMappingScreen::CreateViews() {
+void CustomAnalogMappingScreen::CreateViews() {
 	using namespace UI;
 
 	auto di = GetI18NCategory("Dialog");
@@ -172,24 +189,19 @@ void RightAnalogMappingScreen::CreateViews() {
 	LinearLayout *vert = rightPanel->Add(new LinearLayout(ORIENT_VERTICAL, new LayoutParams(FILL_PARENT, FILL_PARENT)));
 	vert->SetSpacing(0);
 
-	static const char *rightAnalogButton[] = {"None", "L", "R", "Square", "Triangle", "Circle", "Cross", "D-pad up", "D-pad down", "D-pad left", "D-pad right", "Start", "Select"};
-	
+	static const char *analogButton[] = {"None", "L", "R", "Square", "Triangle", "Circle", "Cross", "D-pad up", "D-pad down", "D-pad left", "D-pad right", "Start", "Select"};
+
 	vert->Add(new ItemHeader(co->T("Analog Style")));
-	vert->Add(new CheckBox(&g_Config.touchRightAnalogStick.show, co->T("Visible")));
-	vert->Add(new CheckBox(&g_Config.bRightAnalogCustom, co->T("Use custom right analog")));
-	vert->Add(new CheckBox(&g_Config.bRightAnalogDisableDiagonal, co->T("Disable diagonal input")))->SetEnabledPtr(&g_Config.bRightAnalogCustom);
+	vert->Add(new ItemHeader(co->T("Button Style")));
+	vert->Add(new CheckBox(show_, co->T("Visible")));
+	vert->Add(new CheckBox(diag_, co->T("Enable diagonal")));
 
 	vert->Add(new ItemHeader(co->T("Analog Binding")));
-	PopupMultiChoice *rightAnalogUp = vert->Add(new PopupMultiChoice(&g_Config.iRightAnalogUp, mc->T("RightAn.Up"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
-	PopupMultiChoice *rightAnalogDown = vert->Add(new PopupMultiChoice(&g_Config.iRightAnalogDown, mc->T("RightAn.Down"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
-	PopupMultiChoice *rightAnalogLeft = vert->Add(new PopupMultiChoice(&g_Config.iRightAnalogLeft, mc->T("RightAn.Left"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
-	PopupMultiChoice *rightAnalogRight = vert->Add(new PopupMultiChoice(&g_Config.iRightAnalogRight, mc->T("RightAn.Right"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
-	PopupMultiChoice *rightAnalogPress = vert->Add(new PopupMultiChoice(&g_Config.iRightAnalogPress, co->T("Keep this button pressed when right analog is pressed"), rightAnalogButton, 0, ARRAY_SIZE(rightAnalogButton), mc->GetName(), screenManager()));
-	rightAnalogUp->SetEnabledPtr(&g_Config.bRightAnalogCustom);
-	rightAnalogDown->SetEnabledPtr(&g_Config.bRightAnalogCustom);
-	rightAnalogLeft->SetEnabledPtr(&g_Config.bRightAnalogCustom);
-	rightAnalogRight->SetEnabledPtr(&g_Config.bRightAnalogCustom);
-	rightAnalogPress->SetEnabledPtr(&g_Config.bRightAnalogCustom);
+	vert->Add(new PopupMultiChoice(up_, mc->T("An.Up"), analogButton, 0, ARRAY_SIZE(analogButton), mc->GetName(), screenManager()));
+	vert->Add(new PopupMultiChoice(down_, mc->T("An.Down"), analogButton, 0, ARRAY_SIZE(analogButton), mc->GetName(), screenManager()));
+	vert->Add(new PopupMultiChoice(left_, mc->T("An.Left"), analogButton, 0, ARRAY_SIZE(analogButton), mc->GetName(), screenManager()));
+	vert->Add(new PopupMultiChoice(right_, mc->T("An.Right"), analogButton, 0, ARRAY_SIZE(analogButton), mc->GetName(), screenManager()));
+	vert->Add(new PopupMultiChoice(press_, co->T("Keep this button pressed when analog is pressed"), analogButton, 0, ARRAY_SIZE(analogButton), mc->GetName(), screenManager()));
 }
 
 UI::EventReturn TouchControlVisibilityScreen::OnToggleAll(UI::EventParams &e) {

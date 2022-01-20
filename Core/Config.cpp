@@ -545,13 +545,7 @@ static ConfigSetting generalSettings[] = {
 	ConfigSetting("GridView1", &g_Config.bGridView1, true),
 	ConfigSetting("GridView2", &g_Config.bGridView2, true),
 	ConfigSetting("GridView3", &g_Config.bGridView3, false),
-	ConfigSetting("RightAnalogUp", &g_Config.iRightAnalogUp, 0, true, true),
-	ConfigSetting("RightAnalogDown", &g_Config.iRightAnalogDown, 0, true, true),
-	ConfigSetting("RightAnalogLeft", &g_Config.iRightAnalogLeft, 0, true, true),
-	ConfigSetting("RightAnalogRight", &g_Config.iRightAnalogRight, 0, true, true),
-	ConfigSetting("RightAnalogPress", &g_Config.iRightAnalogPress, 0, true, true),
-	ConfigSetting("RightAnalogCustom", &g_Config.bRightAnalogCustom, false, true, true),
-	ConfigSetting("RightAnalogDisableDiagonal", &g_Config.bRightAnalogDisableDiagonal, false, true, true),
+
 	ConfigSetting("SwipeUp", &g_Config.iSwipeUp, 0, true, true),
 	ConfigSetting("SwipeDown", &g_Config.iSwipeDown, 0, true, true),
 	ConfigSetting("SwipeLeft", &g_Config.iSwipeLeft, 0, true, true),
@@ -560,6 +554,31 @@ static ConfigSetting generalSettings[] = {
 	ConfigSetting("SwipeSmoothing", &g_Config.fSwipeSmoothing, 0.3f, true, true),
 	ConfigSetting("DoubleTapGesture", &g_Config.iDoubleTapGesture, 0, true, true),
 	ConfigSetting("GestureControlEnabled", &g_Config.bGestureControlEnabled, false, true, true),
+
+	ConfigSetting("CustomAnalogUp1", &g_Config.iAnalogUp1, 0, true, true),
+	ConfigSetting("CustomAnalogDown1", &g_Config.iAnalogDown1, 0, true, true),
+	ConfigSetting("CustomAnalogLeft1", &g_Config.iAnalogLeft1, 0, true, true),
+	ConfigSetting("CustomAnalogRight1", &g_Config.iAnalogRight1, 0, true, true),
+	ConfigSetting("CustomAnalogPress1", &g_Config.iAnalogPress1, 0, true, true),
+	ConfigSetting("CustomAnalogDiag1", &g_Config.bAnalogDiag1, true, true, true),
+	ConfigSetting("CustomAnalogUp2", &g_Config.iAnalogUp2, 0, true, true),
+	ConfigSetting("CustomAnalogDown2", &g_Config.iAnalogDown2, 0, true, true),
+	ConfigSetting("CustomAnalogLeft2", &g_Config.iAnalogLeft2, 0, true, true),
+	ConfigSetting("CustomAnalogRight2", &g_Config.iAnalogRight2, 0, true, true),
+	ConfigSetting("CustomAnalogPress2", &g_Config.iAnalogPress2, 0, true, true),
+	ConfigSetting("CustomAnalogDiag2", &g_Config.bAnalogDiag2, true, true, true),
+	ConfigSetting("CustomAnalogUp3", &g_Config.iAnalogUp3, 0, true, true),
+	ConfigSetting("CustomAnalogDown3", &g_Config.iAnalogDown3, 0, true, true),
+	ConfigSetting("CustomAnalogLeft3", &g_Config.iAnalogLeft3, 0, true, true),
+	ConfigSetting("CustomAnalogRight3", &g_Config.iAnalogRight3, 0, true, true),
+	ConfigSetting("CustomAnalogPress3", &g_Config.iAnalogPress3, 0, true, true),
+	ConfigSetting("CustomAnalogDiag3", &g_Config.bAnalogDiag3, true, true, true),
+	ConfigSetting("CustomAnalogUp4", &g_Config.iAnalogUp4, 0, true, true),
+	ConfigSetting("CustomAnalogDown4", &g_Config.iAnalogDown4, 0, true, true),
+	ConfigSetting("CustomAnalogLeft4", &g_Config.iAnalogLeft4, 0, true, true),
+	ConfigSetting("CustomAnalogRight4", &g_Config.iAnalogRight4, 0, true, true),
+	ConfigSetting("CustomAnalogPress4", &g_Config.iAnalogPress4, 0, true, true),
+	ConfigSetting("CustomAnalogDiag4", &g_Config.bAnalogDiag4, true, true, true),
 
 	// "default" means let emulator decide, "" means disable.
 	ConfigSetting("ReportingHost", &g_Config.sReportHost, "default"),
@@ -1026,6 +1045,10 @@ static ConfigSetting controlSettings[] = {
 	ConfigSetting("RKeyX", "RKeyY", "RKeyScale", "ShowTouchRTrigger", &g_Config.touchRKey, defaultTouchPosShow, true, true),
 	ConfigSetting("AnalogStickX", "AnalogStickY", "AnalogStickScale", "ShowAnalogStick", &g_Config.touchAnalogStick, defaultTouchPosShow, true, true),
 	ConfigSetting("RightAnalogStickX", "RightAnalogStickY", "RightAnalogStickScale", "ShowRightAnalogStick", &g_Config.touchRightAnalogStick, defaultTouchPosHide, true, true),
+	ConfigSetting("CustomAnalogStickX1", "CustomAnalogStickY1", "CustomAnalogStickScale1", "ShowCustomAnalogStick1", &g_Config.touchCustomAnalog1, defaultTouchPosHide, true, true),
+	ConfigSetting("CustomAnalogStickX2", "CustomAnalogStickY2", "CustomAnalogStickScale2", "ShowCustomAnalogStick2", &g_Config.touchCustomAnalog2, defaultTouchPosHide, true, true),
+	ConfigSetting("CustomAnalogStickX3", "CustomAnalogStickY3", "CustomAnalogStickScale3", "ShowCustomAnalogStick3", &g_Config.touchCustomAnalog3, defaultTouchPosHide, true, true),
+	ConfigSetting("CustomAnalogStickX4", "CustomAnalogStickY4", "CustomAnalogStickScale4", "ShowCustomAnalogStick4", &g_Config.touchCustomAnalog4, defaultTouchPosHide, true, true),
 
 	ConfigSetting("fcombo0X", "fcombo0Y", "comboKeyScale0", "ShowComboKey0", &g_Config.touchCombo0, defaultTouchPosHide, true, true),
 	ConfigSetting("fcombo1X", "fcombo1Y", "comboKeyScale1", "ShowComboKey1", &g_Config.touchCombo1, defaultTouchPosHide, true, true),
@@ -1896,6 +1919,10 @@ void Config::ResetControlLayout() {
 	reset(g_Config.touchRKey);
 	reset(g_Config.touchAnalogStick);
 	reset(g_Config.touchRightAnalogStick);
+	reset(g_Config.touchCustomAnalog1);
+	reset(g_Config.touchCustomAnalog2);
+	reset(g_Config.touchCustomAnalog3);
+	reset(g_Config.touchCustomAnalog4);
 	reset(g_Config.touchCombo0);
 	reset(g_Config.touchCombo1);
 	reset(g_Config.touchCombo2);

@@ -472,8 +472,8 @@ void PSPStick::ProcessTouch(float x, float y, bool down) {
 	}
 }
 
-PSPCustomStick::PSPCustomStick(ImageID bgImg, const char *key, ImageID stickImg, ImageID stickDownImg, float scale, UI::LayoutParams *layoutParams)
-	: PSPStick(bgImg, key, stickImg, stickDownImg, -1, scale, layoutParams) {
+PSPCustomStick::PSPCustomStick(int up, int down, int left, int right, int press, bool diag, ImageID numImg, ImageID bgImg, const char *key, ImageID stickImg, ImageID stickDownImg, float scale, UI::LayoutParams *layoutParams)
+	: PSPStick(bgImg, key, stickImg, stickDownImg, -1, scale, layoutParams), up_(up), down_(down), left_(left), right_(right), press_(press), diag_(diag), numImg_(numImg) {
 }
 
 void PSPCustomStick::Draw(UIContext &dc) {
@@ -503,8 +503,14 @@ void PSPCustomStick::Draw(UIContext &dc) {
 	if (!g_Config.bHideStickBackground)
 		dc.Draw()->DrawImage(bgImg_, stickX, stickY, 1.0f * scale_, colorBg, ALIGN_CENTER);
 	if (dragPointerId_ != -1 && g_Config.iTouchButtonStyle == 2 && stickDownImg_ != stickImageIndex_)
+/*
 		dc.Draw()->DrawImage(stickDownImg_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f*scale_*g_Config.fRightStickHeadScale, downBg, ALIGN_CENTER);
 	dc.Draw()->DrawImage(stickImageIndex_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f*scale_*g_Config.fRightStickHeadScale, colorBg, ALIGN_CENTER);
+*/
+		dc.Draw()->DrawImage(stickDownImg_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f * scale_, downBg, ALIGN_CENTER);
+	dc.Draw()->DrawImage(stickImageIndex_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f * scale_, colorBg, ALIGN_CENTER);
+	dc.Draw()->DrawImage(numImg_, stickX + dx * stick_size_ * scale_, stickY - dy * stick_size_ * scale_, 1.0f * scale_, colorBg, ALIGN_CENTER);
+
 }
 
 void PSPCustomStick::Touch(const TouchInput &input) {
@@ -564,47 +570,47 @@ void PSPCustomStick::ProcessTouch(float x, float y, bool down) {
 		dx = std::min(1.0f, std::max(-1.0f, dx));
 		dy = std::min(1.0f, std::max(-1.0f, dy));
 
-		if (g_Config.iRightAnalogRight != 0) {
-			if (dx > 0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) > fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogRight-1]);
+		if (right_ != 0) {
+			if (dx > 0.5f && (diag_ || (std::fabs(dx) > std::fabs(dy))))
+				__CtrlButtonDown(button[right_-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogRight-1]);
+				__CtrlButtonUp(button[right_-1]);
 		}
-		if (g_Config.iRightAnalogLeft != 0) {
-			if (dx < -0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) > fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogLeft-1]);
+		if (left_ != 0) {
+			if (dx < -0.5f && (diag_ || (std::fabs(dx) > std::fabs(dy))))
+				__CtrlButtonDown(button[left_-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogLeft-1]);
+				__CtrlButtonUp(button[left_-1]);
 		}
-		if (g_Config.iRightAnalogUp != 0) {
-			if (dy < -0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) <= fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogUp-1]);
+		if (up_ != 0) {
+			if (dy < -0.5f && (diag_ || (std::fabs(dx) <= std::fabs(dy))))
+				__CtrlButtonDown(button[up_-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogUp-1]);
+				__CtrlButtonUp(button[up_-1]);
 		}
-		if (g_Config.iRightAnalogDown != 0) {
-			if (dy > 0.5f && (!g_Config.bRightAnalogDisableDiagonal || fabs(dx) <= fabs(dy)))
-				__CtrlButtonDown(button[g_Config.iRightAnalogDown-1]);
+		if (down_ != 0) {
+			if (dy > 0.5f && (diag_ || (std::fabs(dx) <= std::fabs(dy))))
+				__CtrlButtonDown(button[down_-1]);
 			else
-				__CtrlButtonUp(button[g_Config.iRightAnalogDown-1]);
+				__CtrlButtonUp(button[down_-1]);
 		}
-		if (g_Config.iRightAnalogPress != 0)
-			__CtrlButtonDown(button[g_Config.iRightAnalogPress-1]);
+		if (press_ != 0)
+			__CtrlButtonDown(button[press_-1]);
 
 		posX_ = dx;
 		posY_ = dy;
 
 	} else {
-		if (g_Config.iRightAnalogUp != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogUp-1]);
-		if (g_Config.iRightAnalogDown != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogDown-1]);
-		if (g_Config.iRightAnalogLeft != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogLeft-1]);
-		if (g_Config.iRightAnalogRight != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogRight-1]);
-		if (g_Config.iRightAnalogPress != 0)
-			__CtrlButtonUp(button[g_Config.iRightAnalogPress-1]);
+		if (up_ != 0)
+			__CtrlButtonUp(button[up_-1]);
+		if (down_ != 0)
+			__CtrlButtonUp(button[down_-1]);
+		if (left_ != 0)
+			__CtrlButtonUp(button[left_-1]);
+		if (right_ != 0)
+			__CtrlButtonUp(button[right_-1]);
+		if (press_ != 0)
+			__CtrlButtonUp(button[press_-1]);
 
 		posX_ = 0.0f;
 		posY_ = 0.0f;
@@ -660,6 +666,14 @@ void InitPadLayout(float xres, float yres, float globalScale) {
 	int right_analog_stick_X = Action_button_center_X;
 	int right_analog_stick_Y = yres - 80 * scale;
 	initTouchPos(g_Config.touchRightAnalogStick, right_analog_stick_X, right_analog_stick_Y);
+
+	//custom analog sticks-------------------------------------------------
+	//keep the custom analog stick in the middle
+	int custom_analog_stick_Y = yres - 80 * scale - 200;
+	initTouchPos(g_Config.touchCustomAnalog1, 150+80*scale, custom_analog_stick_Y);
+	initTouchPos(g_Config.touchCustomAnalog2, 300+80*scale, custom_analog_stick_Y);
+	initTouchPos(g_Config.touchCustomAnalog3, 450+80*scale, custom_analog_stick_Y);
+	initTouchPos(g_Config.touchCustomAnalog4, 600+80*scale, custom_analog_stick_Y);
 
 	//select, start, throttle--------------------------------------------
 	//space between the bottom keys (space between select, start and un-throttle)
@@ -831,12 +845,21 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, bool showPau
 	if (g_Config.touchAnalogStick.show)
 		root->Add(new PSPStick(stickBg, "Left analog stick", stickImage, ImageID("I_STICK"), 0, g_Config.touchAnalogStick.scale, buttonLayoutParams(g_Config.touchAnalogStick)));
 
-	if (g_Config.touchRightAnalogStick.show) {
-		if (g_Config.bRightAnalogCustom)
-			root->Add(new PSPCustomStick(stickBg, "Right analog stick", stickImage, ImageID("I_STICK"), g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
-		else
-			root->Add(new PSPStick(stickBg, "Right analog stick", stickImage, ImageID("I_STICK"), 1, g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
-	}
+	if (g_Config.touchRightAnalogStick.show)
+		root->Add(new PSPStick(stickBg, "Right analog stick", stickImage, ImageID("I_STICK"), 1, g_Config.touchRightAnalogStick.scale, buttonLayoutParams(g_Config.touchRightAnalogStick)));
+	
+	if (g_Config.touchCustomAnalog1.show)
+		root->Add(new PSPCustomStick(g_Config.iAnalogUp1, g_Config.iAnalogDown1, g_Config.iAnalogLeft1, g_Config.iAnalogRight1, g_Config.iAnalogPress1, g_Config.bAnalogDiag1, ImageID("I_1"),
+				stickBg, "Custom Analog 1", stickImage, ImageID("I_STICK"), g_Config.touchCustomAnalog1.scale, buttonLayoutParams(g_Config.touchCustomAnalog1)));
+	if (g_Config.touchCustomAnalog2.show)
+		root->Add(new PSPCustomStick(g_Config.iAnalogUp2, g_Config.iAnalogDown2, g_Config.iAnalogLeft2, g_Config.iAnalogRight2, g_Config.iAnalogPress2, g_Config.bAnalogDiag2, ImageID("I_2"),
+				stickBg, "Custom Analog 2", stickImage, ImageID("I_STICK"), g_Config.touchCustomAnalog2.scale, buttonLayoutParams(g_Config.touchCustomAnalog2)));
+	if (g_Config.touchCustomAnalog3.show)
+		root->Add(new PSPCustomStick(g_Config.iAnalogUp3, g_Config.iAnalogDown3, g_Config.iAnalogLeft3, g_Config.iAnalogRight3, g_Config.iAnalogPress3, g_Config.bAnalogDiag3, ImageID("I_3"),
+				stickBg, "Custom Analog 3", stickImage, ImageID("I_STICK"), g_Config.touchCustomAnalog3.scale, buttonLayoutParams(g_Config.touchCustomAnalog3)));
+	if (g_Config.touchCustomAnalog4.show)
+		root->Add(new PSPCustomStick(g_Config.iAnalogUp4, g_Config.iAnalogDown4, g_Config.iAnalogLeft4, g_Config.iAnalogRight4, g_Config.iAnalogPress4, g_Config.bAnalogDiag4, ImageID("I_4"),
+				stickBg, "Custom Analog 4", stickImage, ImageID("I_STICK"), g_Config.touchCustomAnalog4.scale, buttonLayoutParams(g_Config.touchCustomAnalog4)));
 
 	addComboKey(g_Config.CustomKey0, "Custom 1 button", g_Config.touchCombo0);
 	addComboKey(g_Config.CustomKey1, "Custom 2 button", g_Config.touchCombo1);

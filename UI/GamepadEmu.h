@@ -62,8 +62,6 @@ public:
 protected:
 	uint32_t pointerDownMask_ = 0;
 	float scale_;
-
-private:
 	ImageID bgImg_;
 	ImageID bgDownImg_;
 	ImageID img_;
@@ -147,7 +145,7 @@ private:
 
 class PSPCustomStick : public PSPStick {
 public:
-	PSPCustomStick(ImageID bgImg, const char *key, ImageID stickImg, ImageID stickDownImg, float scale, UI::LayoutParams *layoutParams);
+	PSPCustomStick(int up, int down, int left, int right, int press, bool diag, ImageID numImg, ImageID bgImg, const char *key, ImageID stickImg, ImageID stickDownImg, float scale, UI::LayoutParams *layoutParams);
 
 	void Touch(const TouchInput &input) override;
 	void Draw(UIContext &dc) override;
@@ -155,8 +153,15 @@ public:
 private:
 	void ProcessTouch(float x, float y, bool down);
 
+	int up_;
+	int down_;
+	int left_;
+	int right_;
+	int press_;
+	bool diag_;
 	float posX_ = 0.0f;
 	float posY_ = 0.0f;
+	ImageID numImg_;
 };
 
 //initializes the layout from Config. if a default layout does not exist,

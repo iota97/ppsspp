@@ -314,15 +314,6 @@ public:
 	bool bGridView2;
 	bool bGridView3;
 
-	// Right analog binding
-	int iRightAnalogUp;
-	int iRightAnalogDown;
-	int iRightAnalogLeft;
-	int iRightAnalogRight;
-	int iRightAnalogPress;
-	bool bRightAnalogCustom;
-	bool bRightAnalogDisableDiagonal;
-
 	// Motion gesture controller
 	bool bGestureControlEnabled;
 	int iSwipeUp;
@@ -332,6 +323,32 @@ public:
 	float fSwipeSensitivity;
 	float fSwipeSmoothing;
 	int iDoubleTapGesture;
+
+	// Custom analog binding
+	int iAnalogUp1;
+	int iAnalogDown1;
+	int iAnalogLeft1;
+	int iAnalogRight1;
+	int iAnalogPress1;
+	bool bAnalogDiag1;
+	int iAnalogUp2;
+	int iAnalogDown2;
+	int iAnalogLeft2;
+	int iAnalogRight2;
+	int iAnalogPress2;
+	bool bAnalogDiag2;
+	int iAnalogUp3;
+	int iAnalogDown3;
+	int iAnalogLeft3;
+	int iAnalogRight3;
+	int iAnalogPress3;
+	bool bAnalogDiag3;
+	int iAnalogUp4;
+	int iAnalogDown4;
+	int iAnalogLeft4;
+	int iAnalogRight4;
+	int iAnalogPress4;
+	bool bAnalogDiag4;
 
 	// Disable diagonals
 	bool bDisableDpadDiagonals;
@@ -366,6 +383,10 @@ public:
 	ConfigTouchPos touchRKey;
 	ConfigTouchPos touchAnalogStick;
 	ConfigTouchPos touchRightAnalogStick;
+	ConfigTouchPos touchCustomAnalog1;
+	ConfigTouchPos touchCustomAnalog2;
+	ConfigTouchPos touchCustomAnalog3;
+	ConfigTouchPos touchCustomAnalog4;
 
 	ConfigTouchPos touchCombo0;
 	ConfigTouchPos touchCombo1;

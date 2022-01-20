@@ -44,7 +44,17 @@ private:
 	bool nextToggleAll_ = true;
 };
 
-class RightAnalogMappingScreen : public UIDialogScreenWithBackground {
+class CustomAnalogMappingScreen : public UIDialogScreenWithBackground {
 public:
+	CustomAnalogMappingScreen(bool *show, int *up, int *down, int *left, int *right, int *press, bool *diag) : 
+		show_(show), up_(up), down_(down), left_(left), right_(right), press_(press), diag_(diag) {}
 	void CreateViews() override;
+private:
+	bool *show_;
+	int *up_;
+	int *down_;
+	int *left_;
+	int *right_;
+	int *press_;
+	bool *diag_;
 };
