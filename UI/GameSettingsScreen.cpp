@@ -884,6 +884,20 @@ void GameSettingsScreen::CreateViews() {
 	static const char *backgroundAnimations[] = { "No animation", "Floating symbols", "Recent games", "Waves", "Moving background" };
 	systemSettings->Add(new PopupMultiChoice(&g_Config.iBackgroundAnimation, sy->T("UI background animation"), backgroundAnimations, 0, ARRAY_SIZE(backgroundAnimations), sy->GetName(), screenManager()));
 
+	PopupSliderChoiceFloat *UISaturation = new PopupSliderChoiceFloat(&g_Config.fUISaturation, 0.0f, 2.0f, sy->T("UI saturation"), screenManager());
+	systemSettings->Add(UISaturation);
+	UISaturation->OnChange.Add([&](UI::EventParams &) {
+		screenManager()->getUIContext()->Draw()->saturation = g_Config.fUISaturation;
+		return UI::EVENT_CONTINUE;
+	});
+
+	PopupSliderChoiceFloat *UIHueShift = new PopupSliderChoiceFloat(&g_Config.fUIHueShift, 0.0f, 2.0f*M_PI, sy->T("UI Hue shift"), screenManager());
+	systemSettings->Add(UIHueShift);
+	UIHueShift->OnChange.Add([&](UI::EventParams &) {
+		screenManager()->getUIContext()->Draw()->hueShift = g_Config.fUIHueShift;
+		return UI::EVENT_CONTINUE;
+	});
+
 	systemSettings->Add(new ItemHeader(sy->T("PSP Memory Stick")));
 
 #if (defined(USING_QT_UI) || PPSSPP_PLATFORM(WINDOWS) || PPSSPP_PLATFORM(MAC)) && !PPSSPP_PLATFORM(UWP)

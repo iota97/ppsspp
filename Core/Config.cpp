@@ -1169,6 +1169,9 @@ static ConfigSetting upgradeSettings[] = {
 };
 
 static ConfigSetting themeSettings[] = {
+	ConfigSetting("UISaturation", &g_Config.fUISaturation, 0.0f, true, false),
+	ConfigSetting("UIHueShift", &g_Config.fUIHueShift, 0.0f, true, false),
+
 	ConfigSetting("ItemStyleFg", &g_Config.uItemStyleFg, 0xFFFFFFFF, true, false),
 	ConfigSetting("ItemStyleBg", &g_Config.uItemStyleBg, 0x55000000, true, false),
 	ConfigSetting("ItemFocusedStyleFg", &g_Config.uItemFocusedStyleFg, 0xFFFFFFFF, true, false),

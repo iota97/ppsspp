@@ -226,10 +226,28 @@ static const std::vector<ShaderSource> vsCol = {
 	"varying vec4 oColor0;\n"
 
 	"uniform mat4 WorldViewProj;\n"
+	"uniform vec2 ColorCorrection;\n"
 	"void main() {\n"
 	"  gl_Position = WorldViewProj * vec4(Position, 1.0);\n"
-	"  oColor0 = Color0;\n"
-	"}"
+	"  const vec3  kRGBToYPrime = vec3 (0.299, 0.587, 0.114);\n"
+    "  const vec3  kRGBToI      = vec3 (0.596, -0.275, -0.321);\n"
+    "  const vec3  kRGBToQ      = vec3 (0.212, -0.523, 0.311);\n"
+    "  const vec3  kYIQToR     = vec3 (1.0, 0.956, 0.621);\n"
+    "  const vec3  kYIQToG     = vec3 (1.0, -0.272, -0.647);\n"
+    "  const vec3  kYIQToB     = vec3 (1.0, -1.107, 1.704); \n"
+    "  float   YPrime  = dot (Color0.rgb, kRGBToYPrime);\n"
+    "  float   I       = dot (Color0.rgb, kRGBToI);\n"
+    "  float   Q       = dot (Color0.rgb, kRGBToQ);\n"
+    "  float   hue     = atan (Q, I);\n"
+    "  float   chroma  = sqrt (I * I + Q * Q); \n"
+    "  hue += ColorCorrection.y;\n"
+    "  Q = chroma * sin (hue);\n"
+    "  I = chroma * cos (hue);\n"
+    "  vec3    yIQ   = vec3 (YPrime, I, Q); \n"
+    "  vec3 rgb = vec3( dot (yIQ, kYIQToR), dot (yIQ, kYIQToG), dot (yIQ, kYIQToB) );\n"
+	"  oColor0.rgb = mix(vec3(dot(rgb, vec3(0.299, 0.587, 0.114))), rgb, ColorCorrection.x);\n"
+	"  oColor0.a = Color0.a;\n"
+	"}\n"
 	},
 	{ ShaderLanguage::HLSL_D3D9,
 	"struct VS_INPUT { float3 Position : POSITION; float4 Color0 : COLOR0; };\n"
@@ -261,20 +279,39 @@ static const std::vector<ShaderSource> vsCol = {
 	"#extension GL_ARB_shading_language_420pack : enable\n"
 	"layout (std140, set = 0, binding = 0) uniform bufferVals {\n"
 	"    mat4 WorldViewProj;\n"
+	"    vec2 ColorCorrection;\n"
 	"} myBufferVals;\n"
 	"layout (location = 0) in vec4 pos;\n"
 	"layout (location = 1) in vec4 inColor;\n"
 	"layout (location = 0) out vec4 outColor;\n"
 	"out gl_PerVertex { vec4 gl_Position; };\n"
 	"void main() {\n"
-	"   outColor = inColor;\n"
+	"   const vec3  kRGBToYPrime = vec3 (0.299, 0.587, 0.114);\n"
+    "   const vec3  kRGBToI      = vec3 (0.596, -0.275, -0.321);\n"
+    "   const vec3  kRGBToQ      = vec3 (0.212, -0.523, 0.311);\n"
+    "   const vec3  kYIQToR     = vec3 (1.0, 0.956, 0.621);\n"
+    "   const vec3  kYIQToG     = vec3 (1.0, -0.272, -0.647);\n"
+    "   const vec3  kYIQToB     = vec3 (1.0, -1.107, 1.704); \n"
+    "   float   YPrime  = dot (inColor.rgb, kRGBToYPrime);\n"
+    "   float   I       = dot (inColor.rgb, kRGBToI);\n"
+    "   float   Q       = dot (inColor.rgb, kRGBToQ);\n"
+    "   float   hue     = atan (Q, I);\n"
+    "   float   chroma  = sqrt (I * I + Q * Q); \n"
+    "   hue += myBufferVals.ColorCorrection.y;\n"
+    "   Q = chroma * sin (hue);\n"
+    "   I = chroma * cos (hue);\n"
+    "   vec3    yIQ   = vec3 (YPrime, I, Q); \n"
+    "   vec3 rgb = vec3( dot (yIQ, kYIQToR), dot (yIQ, kYIQToG), dot (yIQ, kYIQToB) );\n"
+	"   outColor.rgb = mix(vec3(dot(rgb, vec3(0.299, 0.587, 0.114))), rgb, myBufferVals.ColorCorrection.x);\n"
+	"   outColor.a = inColor.a;\n"
 	"   gl_Position = myBufferVals.WorldViewProj * pos;\n"
 	"}\n"
 	}
 };
 
 const UniformBufferDesc vsColBufDesc { sizeof(VsColUB), {
-	{ "WorldViewProj", 0, -1, UniformType::MATRIX4X4, 0 }
+	{ "WorldViewProj", 0, -1, UniformType::MATRIX4X4, 0 },
+	{ "ColorCorrection", 0, -1, UniformType::FLOAT2, 0 }
 } };
 
 static const std::vector<ShaderSource> vsTexCol = {
@@ -288,10 +325,29 @@ static const std::vector<ShaderSource> vsTexCol = {
 	"attribute vec2 TexCoord0;\n"
 	"varying vec4 oColor0;\n"
 	"varying vec2 oTexCoord0;\n"
+
 	"uniform mat4 WorldViewProj;\n"
+	"uniform vec2 ColorCorrection;\n"
 	"void main() {\n"
 	"  gl_Position = WorldViewProj * vec4(Position, 1.0);\n"
-	"  oColor0 = Color0;\n"
+	"  const vec3  kRGBToYPrime = vec3 (0.299, 0.587, 0.114);\n"
+    "  const vec3  kRGBToI      = vec3 (0.596, -0.275, -0.321);\n"
+    "  const vec3  kRGBToQ      = vec3 (0.212, -0.523, 0.311);\n"
+    "  const vec3  kYIQToR     = vec3 (1.0, 0.956, 0.621);\n"
+    "  const vec3  kYIQToG     = vec3 (1.0, -0.272, -0.647);\n"
+    "  const vec3  kYIQToB     = vec3 (1.0, -1.107, 1.704); \n"
+    "  float   YPrime  = dot (Color0.rgb, kRGBToYPrime);\n"
+    "  float   I       = dot (Color0.rgb, kRGBToI);\n"
+    "  float   Q       = dot (Color0.rgb, kRGBToQ);\n"
+    "  float   hue     = atan (Q, I);\n"
+    "  float   chroma  = sqrt (I * I + Q * Q); \n"
+    "  hue += ColorCorrection.y;\n"
+    "  Q = chroma * sin (hue);\n"
+    "  I = chroma * cos (hue);\n"
+    "  vec3    yIQ   = vec3 (YPrime, I, Q); \n"
+    "  vec3 rgb = vec3( dot (yIQ, kYIQToR), dot (yIQ, kYIQToG), dot (yIQ, kYIQToB) );\n"
+	"  oColor0.rgb = mix(vec3(dot(rgb, vec3(0.299, 0.587, 0.114))), rgb, ColorCorrection.x);\n"
+	"  oColor0.a = Color0.a;\n"
 	"  oTexCoord0 = TexCoord0;\n"
 	"}\n"
 	},
@@ -327,6 +383,7 @@ static const std::vector<ShaderSource> vsTexCol = {
 	"#extension GL_ARB_shading_language_420pack : enable\n"
 	"layout (std140, set = 0, binding = 0) uniform bufferVals {\n"
 	"    mat4 WorldViewProj;\n"
+	"    vec2 ColorCorrection;\n"
 	"} myBufferVals;\n"
 	"layout (location = 0) in vec4 pos;\n"
 	"layout (location = 1) in vec4 inColor;\n"
@@ -335,15 +392,33 @@ static const std::vector<ShaderSource> vsTexCol = {
 	"layout (location = 1) out vec2 outTexCoord;\n"
 	"out gl_PerVertex { vec4 gl_Position; };\n"
 	"void main() {\n"
-	"   outColor = inColor;\n"
 	"   outTexCoord = inTexCoord;\n"
+	"   const vec3  kRGBToYPrime = vec3 (0.299, 0.587, 0.114);\n"
+    "   const vec3  kRGBToI      = vec3 (0.596, -0.275, -0.321);\n"
+    "   const vec3  kRGBToQ      = vec3 (0.212, -0.523, 0.311);\n"
+    "   const vec3  kYIQToR     = vec3 (1.0, 0.956, 0.621);\n"
+    "   const vec3  kYIQToG     = vec3 (1.0, -0.272, -0.647);\n"
+    "   const vec3  kYIQToB     = vec3 (1.0, -1.107, 1.704); \n"
+    "   float   YPrime  = dot (inColor.rgb, kRGBToYPrime);\n"
+    "   float   I       = dot (inColor.rgb, kRGBToI);\n"
+    "   float   Q       = dot (inColor.rgb, kRGBToQ);\n"
+    "   float   hue     = atan (Q, I);\n"
+    "   float   chroma  = sqrt (I * I + Q * Q); \n"
+    "   hue += myBufferVals.ColorCorrection.y;\n"
+    "   Q = chroma * sin (hue);\n"
+    "   I = chroma * cos (hue);\n"
+    "   vec3    yIQ   = vec3 (YPrime, I, Q); \n"
+    "   vec3 rgb = vec3( dot (yIQ, kYIQToR), dot (yIQ, kYIQToG), dot (yIQ, kYIQToB) );\n"
+	"   outColor.rgb = mix(vec3(dot(rgb, vec3(0.299, 0.587, 0.114))), rgb, myBufferVals.ColorCorrection.x);\n"
+	"   outColor.a = inColor.a;\n"
 	"   gl_Position = myBufferVals.WorldViewProj * pos;\n"
 	"}\n"
 	}
 };
 
 const UniformBufferDesc vsTexColBufDesc{ sizeof(VsTexColUB),{
-	{ "WorldViewProj", 0, -1, UniformType::MATRIX4X4, 0 }
+	{ "WorldViewProj", 0, -1, UniformType::MATRIX4X4, 0 },
+	{ "ColorCorrection", 0, -1, UniformType::FLOAT2, 0 }
 } };
 
 ShaderModule *CreateShader(DrawContext *draw, ShaderStage stage, const std::vector<ShaderSource> &sources) {

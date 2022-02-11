@@ -180,6 +180,9 @@ public:
 		curZ_ = curZ;
 	}
 
+	float hueShift = 1.0f;
+	float saturation = 1.0f;
+
 private:
 	struct Vertex {
 		float x, y, z;

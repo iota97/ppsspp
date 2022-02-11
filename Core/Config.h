@@ -256,6 +256,9 @@ public:
 	int iBackgroundAnimation;  // enum BackgroundAnimation
 
 	// TODO: Maybe move to a separate theme system.
+	float fUISaturation;
+	float fUIHueShift;
+
 	uint32_t uItemStyleFg;
 	uint32_t uItemStyleBg;
 	uint32_t uItemFocusedStyleFg;
