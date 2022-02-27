@@ -7,3 +7,6 @@ double time_now_d();
 void sleep_ms(int ms);
 
 void GetTimeFormatted(char formattedTime[13]);
+
+// Range: 0-11
+int GetCurrentMonth();

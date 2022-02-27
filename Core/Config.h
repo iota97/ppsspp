@@ -188,6 +188,7 @@ public:
 
 	float fUITint;
 	float fUISaturation;
+	bool bUIMonthlyColor;
 
 	bool bVertexCache;
 	bool bTextureBackoffCache;

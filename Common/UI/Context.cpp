@@ -10,6 +10,7 @@
 #include "Common/UI/Context.h"
 #include "Common/Render/DrawBuffer.h"
 #include "Common/Render/Text/draw_text.h"
+#include "Common/TimeUtil.h"
 
 #include "Common/Log.h"
 #include "UI/TextureUtil.h"
@@ -57,8 +58,28 @@ void UIContext::BeginFrame() {
 	}
 	uidrawbufferTop_->SetCurZ(0.0f);
 	uidrawbuffer_->SetCurZ(0.0f);
-	uidrawbuffer_->SetTintSaturation(g_Config.fUITint, g_Config.fUISaturation);
-	uidrawbufferTop_->SetTintSaturation(g_Config.fUITint, g_Config.fUISaturation);
+	if (g_Config.bUIMonthlyColor) {
+		static const float months[12][2] = {
+			{0.0f, 0.0f}, // Grey
+			{0.6f, 1.0f}, // Yellow
+			{0.67f, 1.0f}, // Lime
+			{0.34f, 0.75f}, // Pink
+			{0.75f, 1.0f}, // Green
+			{0.11f, 0.87f}, // Blue/Violet
+			{0.9f, 1.0f}, // Aqua
+			{0.07f, 1.2f}, // Blue
+			{0.15f, 1.0f}, // Purple
+			{0.55f, 1.0f}, // Orange
+			{0.47f, 0.4f}, // Brown
+			{0.45f, 1.4f}, // Red
+		};
+		int m = GetCurrentMonth();
+		uidrawbuffer_->SetTintSaturation(months[m][0], months[m][1]);
+		uidrawbufferTop_->SetTintSaturation(months[m][0], months[m][1]);
+	} else {
+		uidrawbuffer_->SetTintSaturation(g_Config.fUITint, g_Config.fUISaturation);
+		uidrawbufferTop_->SetTintSaturation(g_Config.fUITint, g_Config.fUISaturation);
+	}
 	ActivateTopScissor();
 }
 

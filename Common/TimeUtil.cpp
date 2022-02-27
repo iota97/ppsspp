@@ -85,3 +85,11 @@ void GetTimeFormatted(char formattedTime[11]) {
 	snprintf(formattedTime, 11, "%s:%03d", tmp, (int)(t.tv_usec / 1000));
 #endif
 }
+
+int GetCurrentMonth() {
+	time_t sysTime;
+	time(&sysTime);
+
+	struct tm *gmTime = localtime(&sysTime);
+	return gmTime->tm_mon;
+}
