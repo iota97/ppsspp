@@ -73,10 +73,6 @@ struct CoreParameter {
 	int pixelWidth;
 	int pixelHeight;
 
-	// Can be modified at runtime.
-	bool fastForward = false;
-	FPSLimit fpsLimit = FPSLimit::NORMAL;
-
 	bool updateRecent = true;
 
 	// Freeze-frame. For nvidia perfhud profiling. Developers only.
@@ -86,4 +82,13 @@ struct CoreParameter {
 	FileLoader *mountIsoLoader = nullptr;
 
 	Compatibility compat;
+
+	void SetFastForward(bool enabled) { fastForward = enabled; }
+	void SetFpsLimit(FPSLimit limit) { fpsLimit = limit; }
+	bool GetFastForward() { return fastForward; }
+	FPSLimit GetFpsLimit() { return fpsLimit; }
+
+private:
+	bool fastForward = false;
+	FPSLimit fpsLimit = FPSLimit::NORMAL;
 };

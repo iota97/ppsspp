@@ -102,7 +102,7 @@ bool RunTests() {
 	coreParam.pixelWidth = 480;
 	coreParam.pixelHeight = 272;
 	coreParam.collectEmuLog = &output;
-	coreParam.fastForward = true;
+	coreParam.SetFastForward(true);
 	coreParam.updateRecent = false;
 
 	// Never report from tests.

@@ -346,11 +346,11 @@ void __DisplaySetWasPaused() {
 }
 
 static int FrameTimingLimit() {
-	if (PSP_CoreParameter().fpsLimit == FPSLimit::CUSTOM1)
+	if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::CUSTOM1)
 		return g_Config.iFpsLimit1;
-	if (PSP_CoreParameter().fpsLimit == FPSLimit::CUSTOM2)
+	if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::CUSTOM2)
 		return g_Config.iFpsLimit2;
-	if (PSP_CoreParameter().fastForward)
+	if (PSP_CoreParameter().GetFastForward())
 		return 0;
 	return 60;
 }
@@ -564,7 +564,7 @@ void __DisplayFlip(int cyclesLate) {
 		static bool hasNotifiedSlow = false;
 		if (!g_Config.bHideSlowWarnings &&
 			!hasNotifiedSlow &&
-			PSP_CoreParameter().fpsLimit == FPSLimit::NORMAL &&
+			PSP_CoreParameter().GetFpsLimit() == FPSLimit::NORMAL &&
 			DisplayIsRunningSlow()) {
 #ifndef _DEBUG
 			auto err = GetI18NCategory("Error");

@@ -145,7 +145,7 @@ inline void ClampBufferToS16(s16 *out, const s32 *in, size_t size, s8 volShift) 
 
 inline void ClampBufferToS16WithVolume(s16 *out, const s32 *in, size_t size) {
 	int volume = g_Config.iGlobalVolume;
-	if (PSP_CoreParameter().fpsLimit != FPSLimit::NORMAL || PSP_CoreParameter().fastForward) {
+	if (PSP_CoreParameter().GetFpsLimit() != FPSLimit::NORMAL || PSP_CoreParameter().GetFastForward()) {
 		if (g_Config.iAltSpeedVolume != -1) {
 			volume = g_Config.iAltSpeedVolume;
 		}
@@ -269,14 +269,14 @@ void StereoResampler::PushSamples(const s32 *samples, unsigned int numSamples) {
 
 	u32 cap = m_maxBufsize * 2;
 	// If fast-forwarding, no need to fill up the entire buffer, just screws up timing after releasing the fast-forward button.
-	if (PSP_CoreParameter().fastForward) {
+	if (PSP_CoreParameter().GetFastForward()) {
 		cap = m_targetBufsize * 2;
 	}
 
 	// Check if we have enough free space
 	// indexW == m_indexR results in empty buffer, so indexR must always be smaller than indexW
 	if (numSamples * 2 + ((indexW - m_indexR.load()) & INDEX_MASK) >= cap) {
-		if (!PSP_CoreParameter().fastForward) {
+		if (!PSP_CoreParameter().GetFastForward()) {
 			overrunCount_++;
 		}
 		// TODO: "Timestretch" by doing a windowed overlap with existing buffer content?

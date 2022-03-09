@@ -165,6 +165,23 @@ void BoolButton::Touch(const TouchInput &input) {
 	}
 }
 
+void FastForwardButton::Touch(const TouchInput &input) {
+	bool lastDown = pointerDownMask_ != 0;
+	MultiTouchButton::Touch(input);
+	bool down = pointerDownMask_ != 0;
+
+	if (down != lastDown) {
+		PSP_CoreParameter().SetFastForward(down);
+		UI::EventParams params{ this };
+		params.a = down;
+		OnChange.Trigger(params);
+	}
+}
+
+bool FastForwardButton::IsDown() { 
+	return PSP_CoreParameter().GetFastForward();
+}
+
 void PSPButton::Touch(const TouchInput &input) {
 	bool lastDown = pointerDownMask_ != 0;
 	MultiTouchButton::Touch(input);
@@ -809,8 +826,9 @@ UI::ViewGroup *CreatePadLayout(float xres, float yres, bool *pause, bool showPau
 	addPSPButton(CTRL_START, "Start button", rectImage, ImageID("I_RECT"), ImageID("I_START"), g_Config.touchStartKey);
 	addPSPButton(CTRL_SELECT, "Select button", rectImage, ImageID("I_RECT"), ImageID("I_SELECT"), g_Config.touchSelectKey);
 
-	BoolButton *fastForward = addBoolButton(&PSP_CoreParameter().fastForward, "Fast-forward button", rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), g_Config.touchFastForwardKey);
-	if (fastForward) {
+	if (g_Config.touchFastForwardKey.show) {
+		const ConfigTouchPos touch = g_Config.touchFastForwardKey;
+		FastForwardButton *fastForward = root->Add(new FastForwardButton("Fast-forward button", rectImage, ImageID("I_RECT"), ImageID("I_ARROW"), touch.scale, buttonLayoutParams(touch)));
 		fastForward->SetAngle(180.0f);
 		fastForward->OnChange.Add([](UI::EventParams &e) {
 			if (e.a && coreState == CORE_STEPPING) {

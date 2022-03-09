@@ -490,11 +490,11 @@ void GPUCommon::DeviceRestore() {
 void GPUCommon::UpdateVsyncInterval(bool force) {
 #if !(PPSSPP_PLATFORM(ANDROID) || defined(USING_QT_UI) || PPSSPP_PLATFORM(UWP) || PPSSPP_PLATFORM(IOS))
 	int desiredVSyncInterval = g_Config.bVSync ? 1 : 0;
-	if (PSP_CoreParameter().fastForward) {
+	if (PSP_CoreParameter().GetFastForward()) {
 		desiredVSyncInterval = 0;
 	}
-	if (PSP_CoreParameter().fpsLimit != FPSLimit::NORMAL) {
-		int limit = PSP_CoreParameter().fpsLimit == FPSLimit::CUSTOM1 ? g_Config.iFpsLimit1 : g_Config.iFpsLimit2;
+	if (PSP_CoreParameter().GetFpsLimit() != FPSLimit::NORMAL) {
+		int limit = PSP_CoreParameter().GetFpsLimit() == FPSLimit::CUSTOM1 ? g_Config.iFpsLimit1 : g_Config.iFpsLimit2;
 		// For an alternative speed that is a clean factor of 60, the user probably still wants vsync.
 		if (limit == 0 || (limit >= 0 && limit != 15 && limit != 30 && limit != 60)) {
 			desiredVSyncInterval = 0;

@@ -87,6 +87,18 @@ private:
 	bool *value_;
 };
 
+class FastForwardButton : public MultiTouchButton {
+public:
+	FastForwardButton(const char *key, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
+		: MultiTouchButton(key, bgImg, bgDownImg, img, scale, layoutParams) {
+	}
+
+	void Touch(const TouchInput &input) override;
+	bool IsDown() override;
+
+	UI::Event OnChange;
+};
+
 class PSPButton : public MultiTouchButton {
 public:
 	PSPButton(int pspButtonBit, const char *key, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, UI::LayoutParams *layoutParams)
