@@ -62,6 +62,7 @@ public:
 protected:
 	uint32_t pointerDownMask_ = 0;
 	float scale_;
+	float opacityFactor_ = 1.0f;
 
 private:
 	ImageID bgImg_;
@@ -95,6 +96,7 @@ public:
 
 	void Touch(const TouchInput &input) override;
 	bool IsDown() override;
+	void Draw(UIContext &dc) override;
 
 	UI::Event OnChange;
 };
@@ -181,11 +183,11 @@ const int baseActionButtonSpacing = 60;
 
 class ComboKey : public MultiTouchButton {
 public:
-	ComboKey(uint64_t pspButtonBit, const char *key, bool toggle, ControlMapper* controllMapper, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, bool invertedContextDimension, UI::LayoutParams *layoutParams)
-		: MultiTouchButton(key, bgImg, bgDownImg, img, scale, layoutParams), pspButtonBit_(pspButtonBit), toggle_(toggle), controllMapper_(controllMapper), on_(false), invertedContextDimension_(invertedContextDimension) {
-	}
+	ComboKey(uint64_t pspButtonBit, const char *key, bool toggle, ControlMapper* controllMapper, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, bool invertedContextDimension, UI::LayoutParams *layoutParams);
+
 	void Touch(const TouchInput &input) override;
 	bool IsDown() override;
+	void Draw(UIContext &dc) override;
 
 	void GetContentDimensions(const UIContext &dc, float &w, float &h) const override;
 private:
@@ -194,6 +196,7 @@ private:
 	ControlMapper* controllMapper_;
 	bool on_;
 	bool invertedContextDimension_; // Swap width and height
+	bool onlySpeedChanging_;
 };
 
 class GestureGamepad : public UI::View {

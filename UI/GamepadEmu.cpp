@@ -119,7 +119,7 @@ void MultiTouchButton::Touch(const TouchInput &input) {
 }
 
 void MultiTouchButton::Draw(UIContext &dc) {
-	float opacity = GetButtonOpacity();
+	float opacity = GetButtonOpacity() * opacityFactor_;
 	if (opacity <= 0.0f)
 		return;
 
@@ -178,6 +178,11 @@ void FastForwardButton::Touch(const TouchInput &input) {
 	}
 }
 
+void FastForwardButton::Draw(UIContext &dc) {
+	opacityFactor_ = PSP_CoreParameter().IsFastForwardAllowed() ? 1.0f : 0.5f;
+	MultiTouchButton::Draw(dc);
+}
+
 bool FastForwardButton::IsDown() { 
 	return PSP_CoreParameter().GetFastForward();
 }
@@ -196,8 +201,33 @@ void PSPButton::Touch(const TouchInput &input) {
 	}
 }
 
+ComboKey::ComboKey(uint64_t pspButtonBit, const char *key, bool toggle, ControlMapper* controllMapper, ImageID bgImg, ImageID bgDownImg, ImageID img, float scale, bool invertedContextDimension, UI::LayoutParams *layoutParams)
+	: MultiTouchButton(key, bgImg, bgDownImg, img, scale, layoutParams), pspButtonBit_(pspButtonBit), toggle_(toggle), controllMapper_(controllMapper), on_(false), invertedContextDimension_(invertedContextDimension) {
+	uint64_t speedChangeMask = 0;
+	for (int i = 0; i < ARRAY_SIZE(CustomKey::comboKeyList); ++i) {
+		if (CustomKey::comboKeyList[i].c == VIRTKEY_FASTFORWARD ||
+		CustomKey::comboKeyList[i].c == VIRTKEY_SPEED_TOGGLE ||
+		CustomKey::comboKeyList[i].c == VIRTKEY_SPEED_CUSTOM1 ||
+			CustomKey::comboKeyList[i].c == VIRTKEY_SPEED_CUSTOM2) {
+			speedChangeMask += (1ULL << i);
+		}
+	}
+	onlySpeedChanging_ = pspButtonBit_ == (pspButtonBit_ & speedChangeMask);
+}
+
 bool ComboKey::IsDown() {
 	return (toggle_ && on_) || (!toggle_ && pointerDownMask_ != 0);
+}
+
+void ComboKey::Draw(UIContext &dc) {
+	// Only have speed changing button
+	if (onlySpeedChanging_ && !PSP_CoreParameter().IsFastForwardAllowed()) {
+		opacityFactor_ = 0.5f;
+		on_ = false;
+	} else {
+		opacityFactor_ = 1.0f;
+	}
+	MultiTouchButton::Draw(dc);
 }
 
 void ComboKey::GetContentDimensions(const UIContext &dc, float &w, float &h) const {
@@ -210,6 +240,10 @@ void ComboKey::GetContentDimensions(const UIContext &dc, float &w, float &h) con
 }
 
 void ComboKey::Touch(const TouchInput &input) {
+	if (onlySpeedChanging_ && !PSP_CoreParameter().IsFastForwardAllowed()) {
+		return;
+	}
+
 	using namespace CustomKey;
 	bool lastDown = pointerDownMask_ != 0;
 	MultiTouchButton::Touch(input);

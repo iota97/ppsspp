@@ -561,6 +561,7 @@
     <ClCompile Include="Replay.cpp" />
     <ClCompile Include="TextureReplacer.cpp" />
     <ClCompile Include="Compatibility.cpp" />
+    <ClCompile Include="CoreParameter.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="CoreTiming.cpp" />

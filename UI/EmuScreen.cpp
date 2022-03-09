@@ -579,26 +579,28 @@ void EmuScreen::onVKeyDown(int virtualKeyCode) {
 
 	case VIRTKEY_SPEED_TOGGLE:
 		// Cycle through enabled speeds.
-		if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::NORMAL && g_Config.iFpsLimit1 >= 0) {
-			PSP_CoreParameter().SetFpsLimit(FPSLimit::CUSTOM1);
-			osm.Show(sc->T("fixed", "Speed: alternate"), 1.0);
-		} else if (PSP_CoreParameter().GetFpsLimit() != FPSLimit::CUSTOM2 && g_Config.iFpsLimit2 >= 0) {
-			PSP_CoreParameter().SetFpsLimit(FPSLimit::CUSTOM2);
-			osm.Show(sc->T("SpeedCustom2", "Speed: alternate 2"), 1.0);
-		} else if (PSP_CoreParameter().GetFpsLimit() != FPSLimit::NORMAL) {
-			PSP_CoreParameter().SetFpsLimit(FPSLimit::NORMAL);
-			osm.Show(sc->T("standard", "Speed: standard"), 1.0);
+		if (PSP_CoreParameter().IsFastForwardAllowed()) {
+			if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::NORMAL && g_Config.iFpsLimit1 >= 0) {
+				PSP_CoreParameter().SetFpsLimit(FPSLimit::CUSTOM1);
+				osm.Show(sc->T("fixed", "Speed: alternate"), 1.0);
+			} else if (PSP_CoreParameter().GetFpsLimit() != FPSLimit::CUSTOM2 && g_Config.iFpsLimit2 >= 0) {
+				PSP_CoreParameter().SetFpsLimit(FPSLimit::CUSTOM2);
+				osm.Show(sc->T("SpeedCustom2", "Speed: alternate 2"), 1.0);
+			} else if (PSP_CoreParameter().GetFpsLimit() != FPSLimit::NORMAL) {
+				PSP_CoreParameter().SetFpsLimit(FPSLimit::NORMAL);
+				osm.Show(sc->T("standard", "Speed: standard"), 1.0);
+			}
 		}
 		break;
 
 	case VIRTKEY_SPEED_CUSTOM1:
-		if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::NORMAL) {
+		if (PSP_CoreParameter().IsFastForwardAllowed() && PSP_CoreParameter().GetFpsLimit() == FPSLimit::NORMAL) {
 			PSP_CoreParameter().SetFpsLimit(FPSLimit::CUSTOM1);
 			osm.Show(sc->T("fixed", "Speed: alternate"), 1.0);
 		}
 		break;
 	case VIRTKEY_SPEED_CUSTOM2:
-		if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::NORMAL) {
+		if (PSP_CoreParameter().IsFastForwardAllowed() && PSP_CoreParameter().GetFpsLimit() == FPSLimit::NORMAL) {
 			PSP_CoreParameter().SetFpsLimit(FPSLimit::CUSTOM2);
 			osm.Show(sc->T("SpeedCustom2", "Speed: alternate 2"), 1.0);
 		}
@@ -721,13 +723,13 @@ void EmuScreen::onVKeyUp(int virtualKeyCode) {
 		break;
 
 	case VIRTKEY_SPEED_CUSTOM1:
-		if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::CUSTOM1) {
+		if (PSP_CoreParameter().IsFastForwardAllowed() && PSP_CoreParameter().GetFpsLimit() == FPSLimit::CUSTOM1) {
 			PSP_CoreParameter().SetFpsLimit(FPSLimit::NORMAL);
 			osm.Show(sc->T("standard", "Speed: standard"), 1.0);
 		}
 		break;
 	case VIRTKEY_SPEED_CUSTOM2:
-		if (PSP_CoreParameter().GetFpsLimit() == FPSLimit::CUSTOM2) {
+		if (PSP_CoreParameter().IsFastForwardAllowed() && PSP_CoreParameter().GetFpsLimit() == FPSLimit::CUSTOM2) {
 			PSP_CoreParameter().SetFpsLimit(FPSLimit::NORMAL);
 			osm.Show(sc->T("standard", "Speed: standard"), 1.0);
 		}

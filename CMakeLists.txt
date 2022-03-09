@@ -1623,6 +1623,7 @@ add_library(${CoreLibName} ${CoreLinkType}
 	Core/Core.h
 	Core/Compatibility.cpp
 	Core/Compatibility.h
+	Core/CoreParameter.cpp
 	Core/CoreParameter.h
 	Core/CoreTiming.cpp
 	Core/CoreTiming.h

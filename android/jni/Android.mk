@@ -393,6 +393,7 @@ EXEC_AND_LIB_FILES := \
   $(SRC)/Core/ControlMapper.cpp \
   $(SRC)/Core/Core.cpp \
   $(SRC)/Core/Compatibility.cpp \
+  $(SRC)/Core/CoreParameter.cpp \
   $(SRC)/Core/Config.cpp \
   $(SRC)/Core/CoreTiming.cpp \
   $(SRC)/Core/CwCheat.cpp \

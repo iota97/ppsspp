@@ -646,6 +646,9 @@
     <ClCompile Include="Compatibility.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="CoreParameter.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="HW\SasReverb.cpp">
       <Filter>HW</Filter>
     </ClCompile>

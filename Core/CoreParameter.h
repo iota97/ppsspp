@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "Common/File/Path.h"
 #include "Core/Compatibility.h"
 
 enum GPUCore {
@@ -83,12 +84,17 @@ struct CoreParameter {
 
 	Compatibility compat;
 
-	void SetFastForward(bool enabled) { fastForward = enabled; }
-	void SetFpsLimit(FPSLimit limit) { fpsLimit = limit; }
-	bool GetFastForward() { return fastForward; }
-	FPSLimit GetFpsLimit() { return fpsLimit; }
+	void SetFastForward(bool enabled);
+	void SetFpsLimit(FPSLimit limit);
+	bool GetFastForward();
+	FPSLimit GetFpsLimit();
+
+	// Also affect FpsLimit
+	void AllowFastForward(bool allow) ;
+	bool IsFastForwardAllowed();
 
 private:
+	bool allowFastForward = true;
 	bool fastForward = false;
 	FPSLimit fpsLimit = FPSLimit::NORMAL;
 };

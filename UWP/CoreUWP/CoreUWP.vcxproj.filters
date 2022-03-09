@@ -87,6 +87,7 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="..\..\Core\Compatibility.cpp" />
+    <ClCompile Include="..\..\Core\CoreParameter.cpp" />
     <ClCompile Include="..\..\Core\Config.cpp" />
     <ClCompile Include="..\..\Core\Core.cpp" />
     <ClCompile Include="..\..\Core\CoreTiming.cpp" />
