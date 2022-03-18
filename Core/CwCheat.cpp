@@ -177,15 +177,29 @@ void CheatFileParser::ParseLine(const std::string &line) {
 		// Game title.
 		return;
 
+	case 'H':
+		// Header
+		Flush();
+
+		cheatInfo_.push_back({ line_, line.length() >= 4 ? line.substr(3) : "", false, CheatInfoType::HEADER });
+		return;
+
+	case 'D':
+		// Description
+		Flush();
+
+		cheatInfo_.push_back({ line_, line.length() >= 4 ? line.substr(3) : "", false, CheatInfoType::DESCRIPTION });
+		return;
+
 	case 'C':
 		Flush();
 
 		// Cheat name and activation status.
 		if (line.length() >= 3 && line[2] >= '1' && line[2] <= '9') {
-			lastCheatInfo_ = { line_, line.length() >= 5 ? line.substr(4) : "", true };
+			lastCheatInfo_ = { line_, line.length() >= 5 ? line.substr(4) : "", true, CheatInfoType::NAME };
 			cheatEnabled_ = true;
 		} else if (line.length() >= 3 && line[2] == '0') {
-			lastCheatInfo_ = { line_, line.length() >= 5 ? line.substr(4) : "", false };
+			lastCheatInfo_ = { line_, line.length() >= 5 ? line.substr(4) : "", false, CheatInfoType::NAME };
 			cheatEnabled_ = false;
 		} else {
 			AddError("could not parse cheat name line");

@@ -85,7 +85,7 @@ void CwCheatScreen::CreateViews() {
 	Margins actionMenuMargins(50, -15, 15, 0);
 
 	LinearLayout *leftColumn = new LinearLayout(ORIENT_VERTICAL, new LinearLayoutParams(400, FILL_PARENT));
-	leftColumn->Add(new ItemHeader(cw->T("Options")));
+	leftColumn->Add(new ItemHeader(cw->T("Options")))->centerText(true);
 	//leftColumn->Add(new Choice(cw->T("Add Cheat")))->OnClick.Handle(this, &CwCheatScreen::OnAddCheat);
 	leftColumn->Add(new Choice(cw->T("Import Cheats")))->OnClick.Handle(this, &CwCheatScreen::OnImportCheat);
 #if !defined(MOBILE_DEVICE)
@@ -100,11 +100,25 @@ void CwCheatScreen::CreateViews() {
 	LinearLayout *rightColumn = new LinearLayoutList(ORIENT_VERTICAL, new LinearLayoutParams(200, FILL_PARENT, actionMenuMargins));
 	rightScroll_->Add(rightColumn);
 
-	rightColumn->Add(new ItemHeader(cw->T("Cheats")));
+	rightColumn->Add(new ItemHeader(cw->T("Cheats")))->centerText(true);
+	CheckBox *cheat = nullptr;
 	for (size_t i = 0; i < fileInfo_.size(); ++i) {
-		rightColumn->Add(new CheckBox(&fileInfo_[i].enabled, fileInfo_[i].name))->OnClick.Add([=](UI::EventParams &) {
-			return OnCheckBox((int)i);
-		});
+		switch (fileInfo_[i].type) {
+		case CheatInfoType::NAME:
+			cheat = rightColumn->Add(new CheckBox(&fileInfo_[i].enabled, fileInfo_[i].name));
+			cheat->OnClick.Add([=](UI::EventParams &) {
+				return OnCheckBox((int)i);
+			});
+			break;
+		case CheatInfoType::HEADER:
+			rightColumn->Add(new ItemHeader(fileInfo_[i].name));
+			break;
+		case CheatInfoType::DESCRIPTION:
+			if (cheat)
+				cheat->setDescripton(fileInfo_[i].name);
+			cheat = nullptr;
+			break;
+		}
 	}
 
 	LinearLayout *layout = new LinearLayout(ORIENT_HORIZONTAL, new LayoutParams(FILL_PARENT, FILL_PARENT));
@@ -226,7 +240,14 @@ UI::EventReturn CwCheatScreen::OnImportCheat(UI::EventParams &params) {
 				if (finished == false){
 					line = GetLineNoNewline(linebuf, sizeof(linebuf), in);
 				}
-				if (line && line[0] == '_' && line[1] == 'C') {
+				if (line && line[0] == '_' && (line[1] == 'H' || line[1] == 'D')) {
+					finished = false;
+					for (const auto &existing : fileInfo_) {
+						if (std::string(line).substr(3) == existing.name)
+							goto loop;
+					}
+					newList.push_back(line);
+				} else if (line && line[0] == '_' && line[1] == 'C') {
 					// Test if cheat already exists.
 					for (const auto &existing : fileInfo_) {
 						if (std::string(line).substr(4) == existing.name) {
@@ -342,6 +363,8 @@ bool CwCheatScreen::RebuildCheatFile(int index) {
 
 	if (index == INDEX_ALL) {
 		for (const auto &info : fileInfo_) {
+			if (info.type != CheatInfoType::NAME)
+				continue;
 			// Bail out if any don't match with no changes.
 			if (!updateLine(info)) {
 				return false;

@@ -36,10 +36,17 @@ struct CheatCode {
 	std::vector<CheatLine> lines;
 };
 
+enum class CheatInfoType {
+	NAME,
+	HEADER,
+	DESCRIPTION,
+};
+
 struct CheatFileInfo {
 	int lineNum;
 	std::string name;
 	bool enabled;
+	CheatInfoType type;
 };
 
 struct CheatOperation;

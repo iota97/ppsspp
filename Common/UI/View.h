@@ -808,9 +808,11 @@ public:
 	void Draw(UIContext &dc) override;
 	std::string DescribeText() const override;
 	void GetContentDimensionsBySpec(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert, float &w, float &h) const override;
+	void centerText(bool center);
 
 private:
 	std::string text_;
+	bool centerText_ = false;
 };
 
 class PopupHeader : public Item {
@@ -837,7 +839,7 @@ public:
 	void Draw(UIContext &dc) override;
 	std::string DescribeText() const override;
 	void GetContentDimensions(const UIContext &dc, float &w, float &h) const override;
-
+	void setDescripton(const std::string &desc) { desc_ = desc; }
 	EventReturn OnClicked(EventParams &e);
 	//allow external agents to toggle the checkbox
 	virtual void Toggle();
@@ -848,6 +850,7 @@ private:
 	bool *toggle_;
 	std::string text_;
 	std::string smallText_;
+	std::string desc_;
 };
 
 class BitCheckBox : public CheckBox {

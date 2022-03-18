@@ -578,9 +578,13 @@ ItemHeader::ItemHeader(const std::string &text, LayoutParams *layoutParams)
 	layoutParams_->height = 40;
 }
 
+void ItemHeader::centerText(bool center) {
+	centerText_ = center;
+}
+
 void ItemHeader::Draw(UIContext &dc) {
 	dc.SetFontStyle(dc.theme->uiFontSmall);
-	dc.DrawText(text_.c_str(), bounds_.x + 4, bounds_.centerY(), dc.theme->headerStyle.fgColor, ALIGN_LEFT | ALIGN_VCENTER);
+	dc.DrawText(text_.c_str(), centerText_ ? bounds_.centerX() : bounds_.x + 4, bounds_.centerY(), dc.theme->headerStyle.fgColor, (centerText_ ? ALIGN_CENTER : ALIGN_LEFT) | ALIGN_VCENTER);
 	dc.Draw()->DrawImageCenterTexel(dc.theme->whiteImage, bounds_.x, bounds_.y2()-2, bounds_.x2(), bounds_.y2(), dc.theme->headerStyle.fgColor);
 }
 
@@ -710,8 +714,21 @@ void CheckBox::Draw(UIContext &dc) {
 	float scale = CalculateTextScale(dc, availWidth);
 
 	dc.SetFontScale(scale, scale);
-	Bounds textBounds(bounds_.x + paddingX, bounds_.y, availWidth, bounds_.h);
-	dc.DrawTextRect(text_.c_str(), textBounds, style.fgColor, ALIGN_VCENTER | FLAG_WRAP_TEXT);
+	if (desc_.empty()) {
+		Bounds textBounds(bounds_.x + paddingX, bounds_.y, availWidth, bounds_.h);
+		dc.DrawTextRect(text_.c_str(), textBounds, style.fgColor, ALIGN_VCENTER | FLAG_WRAP_TEXT);
+	} else {
+		float w, h;
+		Bounds availBounds(0, 0, availWidth, bounds_.h);
+		dc.MeasureTextRect(dc.theme->uiFont, scale, scale, text_.c_str(), (int)text_.size(), availBounds, &w, &h, ALIGN_VCENTER | FLAG_WRAP_TEXT);
+		Bounds textBounds(bounds_.x + paddingX, bounds_.y, availWidth, h);
+		dc.DrawTextRect(text_.c_str(), textBounds, style.fgColor, ALIGN_VCENTER | FLAG_WRAP_TEXT);
+
+		dc.SetFontScale(0.65f, 0.65f);
+		Bounds descBounds(bounds_.x + paddingX, bounds_.y + h, availWidth, bounds_.h - h);
+		dc.DrawTextRect(desc_.c_str(), descBounds, style.fgColor, ALIGN_VCENTER | FLAG_WRAP_TEXT);
+	}
+
 	dc.Draw()->DrawImage(image, bounds_.x2() - paddingX, bounds_.centerY(), 1.0f, style.fgColor, ALIGN_RIGHT | ALIGN_VCENTER);
 	dc.SetFontScale(1.0f, 1.0f);
 }
@@ -753,8 +770,16 @@ void CheckBox::GetContentDimensions(const UIContext &dc, float &w, float &h) con
 	Bounds availBounds(0, 0, availWidth, bounds_.h);
 	dc.MeasureTextRect(dc.theme->uiFont, scale, scale, text_.c_str(), (int)text_.size(), availBounds, &actualWidth, &actualHeight, ALIGN_VCENTER | FLAG_WRAP_TEXT);
 
+	if (desc_.empty()) {
+		h = std::max(actualHeight, ITEM_HEIGHT);
+	} else {
+		float actualHeightDesc;
+		Bounds availBoundsDesc(0, actualHeight, availWidth, bounds_.h);
+		dc.MeasureTextRect(dc.theme->uiFont, 0.65, 0.65, desc_.c_str(), (int)desc_.size(), availBoundsDesc, &actualWidth, &actualHeightDesc, ALIGN_VCENTER | FLAG_WRAP_TEXT);
+		h = actualHeight+actualHeightDesc;
+	}
 	w = bounds_.w;
-	h = std::max(actualHeight, ITEM_HEIGHT);
+
 }
 
 void BitCheckBox::Toggle() {
